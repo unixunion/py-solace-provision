@@ -1,0 +1,4 @@
+---
+dmrClusterName: mydmr
+remoteAddress: 2.3.4.5
+remoteNodeName: solace-stk

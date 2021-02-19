@@ -1,0 +1,12 @@
+---
+authenticationBasicEnabled: true
+authenticationBasicType: internal
+authenticationClientCertEnabled: true
+authenticationBasicPassword: password
+directOnlyEnabled: false
+dmrClusterName: mydmr
+enabled: false
+# nodeName: solace-bru
+tlsServerCertEnforceTrustedCommonNameEnabled: true
+tlsServerCertMaxChainDepth: 3
+tlsServerCertValidateDateEnabled: true

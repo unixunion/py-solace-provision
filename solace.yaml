@@ -1,0 +1,5 @@
+---
+SOLACE_CONFIG:
+  host: http://localhost:8080/SEMP/v2/config
+  username: admin
+  password: admin

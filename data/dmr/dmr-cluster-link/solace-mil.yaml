@@ -1,0 +1,37 @@
+---
+authenticationScheme: basic
+authenticationBasicPassword: password
+clientProfileQueueControl1MaxDepth: 20000
+clientProfileQueueControl1MinMsgBurst: 4
+clientProfileQueueDirect1MaxDepth: 20000
+clientProfileQueueDirect1MinMsgBurst: 4
+clientProfileQueueDirect2MaxDepth: 20000
+clientProfileQueueDirect2MinMsgBurst: 4
+clientProfileQueueDirect3MaxDepth: 20000
+clientProfileQueueDirect3MinMsgBurst: 4
+clientProfileQueueGuaranteed1MaxDepth: 20000
+clientProfileQueueGuaranteed1MinMsgBurst: 255
+clientProfileTcpCongestionWindowSize: 2
+clientProfileTcpKeepaliveCount: 5
+clientProfileTcpKeepaliveIdleTime: 3
+clientProfileTcpKeepaliveInterval: 1
+clientProfileTcpMaxSegmentSize: 1460
+clientProfileTcpMaxWindowSize: 256
+dmrClusterName: mydmr
+egressFlowWindowSize: 255
+enabled: true
+initiator: lexical
+queueDeadMsgQueue: "#DEAD_MSG_QUEUE"
+queueEventSpoolUsageThreshold:
+  clearPercent: 1
+  setPercent: 2
+queueMaxDeliveredUnackedMsgsPerFlow: 1000000
+queueMaxMsgSpoolUsage: 800000
+queueMaxRedeliveryCount: 0
+queueMaxTtl: 0
+queueRejectMsgToSenderOnDiscardBehavior: always
+queueRespectTtlEnabled: false
+remoteNodeName: solace-mil
+span: internal
+transportCompressedEnabled: false
+transportTlsEnabled: false

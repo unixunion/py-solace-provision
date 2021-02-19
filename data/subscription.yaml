@@ -1,0 +1,4 @@
+---
+msgVpnName: default
+queueName: unibet.CustomerDepositFailureEvents.de-d2-bridge
+subscriptionTopic: unibet.buster.topic.CustomerDepositFailureEvents
