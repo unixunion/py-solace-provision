@@ -7,6 +7,7 @@ import yaml
 from sp.util import getTypeParamFromDocStrings, is_primitive, str2bool
 
 logger = logging.getLogger('solace-provision')
+logger.debug("imported")
 
 
 # proxy the call and correct the args to be *args instead of key=val

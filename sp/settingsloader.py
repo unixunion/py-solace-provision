@@ -53,7 +53,7 @@ for yaml_file in __yamlfiles__:
 
     # set the defaults
     for default in defaults:
-        logging.info("Setting default %s:%s" % (default, defaults[default]))
+        logging.debug("Setting default %s:%s" % (default, defaults[default]))
         globals()[default] = defaults[default]
 
     # TODO FIXME
@@ -61,7 +61,7 @@ for yaml_file in __yamlfiles__:
 
     # get the real values if any
     for variable in yaml_settings.keys():
-        logging.info("Setting config %s:%s" % (variable, yaml_settings[variable]))
+        logging.debug("Setting config %s:%s" % (variable, yaml_settings[variable]))
         globals()[variable] = yaml_settings[variable]
 
     yaml_loaded = True
