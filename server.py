@@ -63,14 +63,14 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    client = getClient(settings=settings)
+    client_resolver = getClient
 
     parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter, exit_on_error=False)
     def x():
         pass
     parser.__setattr__("exit", x)
     subparsers = parser.add_subparsers(help='sub-command help')
-    [active_modules.append(m(subparsers, client)) for m in sp_modules]
+    [active_modules.append(m(subparsers, client_resolver)) for m in sp_modules]
 
     with socketserver.TCPServer((settings.SERVER["host"], settings.SERVER["port"]), MyTCPHandler) as server:
         server.serve_forever()

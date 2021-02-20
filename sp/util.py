@@ -14,7 +14,15 @@ primitive = ("int", "str", "bool")
 
 
 def getClient(subcommand=None, config_class=None, client_class=None):
+    """
+    Creates a client of the type for the passed parameters.
 
+    :param subcommand: the name of the subcommand is used to load the appropriate config sub-attributes under SOLACE_CONFIG
+    :param config_class: Class of the config to instantiate
+    :param client_class: Class of the client to instantiate
+    :return: the client instantiated using the client_class param
+    :rtype: object
+    """
     config = config_class()
 
     config.host = settings.SOLACE_CONFIG[subcommand]["host"]
@@ -26,13 +34,22 @@ def getClient(subcommand=None, config_class=None, client_class=None):
     return client
 
 
+def genericOutputProcessor(target_method, *args, callback=None, **kwargs):
+    logger.debug("genericOutputProcessor calling target with args: %s kwargs: %s" % (args, kwargs))
+    data = target_method(*args, **kwargs)
+    logger.debug("data: %s" % data)
+    if callback:
+        callback(data, *args, **kwargs)
+    return data
+
+
 # process output, and recurs if cursor is in response
 # todo fixme this should not make assumptions about the data type
 def processOutput(target_method, args, callback=None, **kwargs):
     data = target_method(args, **kwargs)
 
     logger.debug("data: %s" % data)
-    #logger.debug("no data, could be semp meta only")
+    # logger.debug("no data, could be semp meta only")
 
     if (isinstance(data.data, list)):
         logger.debug("list response")
