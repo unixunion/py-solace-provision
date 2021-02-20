@@ -20,7 +20,7 @@ The settingsloader searches for a solace.yaml file in above locations.
 
 The environment variable: :envvar:`PYSOLPRO_CONFIG` can also be used to specify another file. e.g
 
-    PYSOLPRO_CONFIG="/tmp/my.yaml" ./bin/solace-configure.py ....
+    PYSOLPRO_CONFIG="/tmp/my.yaml" ./bin/pysolpro.py ....
 
 Examples:
 
