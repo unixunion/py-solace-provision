@@ -1,7 +1,10 @@
 import inspect
 import logging
+from argparse import ArgumentParser
 
-from solace_semp_config import AllApi
+from solace_semp_config import AllApi as ConfigAllApi
+from solace_semp_monitor import AllApi as MonitorAllApi
+from solace_semp_action import AllApi as ActionAllApi
 
 from sp.CallProxy import CallProxy
 from sp.util import is_primitive, getTypeParamFromDocStrings
@@ -16,16 +19,20 @@ class AutoManageGenerator(object):
     help = "vpn help text..."
 
     klasses = [
-        {"api": AllApi}
+        {"api": ConfigAllApi, "command": "config"},
+        {"api": MonitorAllApi, "command": "monitor"},
+        {"api": ActionAllApi, "command": "action"}
     ]
 
     parsers = []
 
-    def __init__(self, parser, api_client):
-        if parser:
+    def __init__(self, subparsers, api_client):
+        if subparsers:
             for provider_api in self.klasses:
-                t = provider_api["api"](api_client=api_client)
-                self.parsers.append(self.autoSubCommandArgParser(subparsers=parser,
+                subp = subparsers.add_parser(provider_api["command"])
+
+                #self.parsers.append(subp)
+                self.parsers.append(self.autoSubCommandArgParser(subparsers=subp.add_subparsers(),
                                                                  apiclass=provider_api["api"],
                                                                  callback=provider_api["api"](
                                                                      api_client=api_client)))

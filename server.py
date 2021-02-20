@@ -5,7 +5,7 @@ import logging
 import socketserver
 import sys
 
-from solace_semp_client.rest import ApiException
+from solace_semp_config.rest import ApiException
 
 import sp.settingsloader as settings
 from sp.AutoManageGenerator import AutoManageGenerator
