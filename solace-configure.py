@@ -41,7 +41,7 @@ if __name__ == '__main__':
     except Exception as e:
         pass
     args = parser.parse_args()
-    from solace_semp_client.rest import ApiException
+    from solace_semp_config.rest import ApiException
     if hasattr(args, "func"):
         try:
             processOutput(args.func, args)

@@ -1,7 +1,7 @@
 import inspect
 import logging
 
-from solace_semp_client import AllApi
+from solace_semp_config import AllApi
 
 from sp.CallProxy import CallProxy
 from sp.util import is_primitive, getTypeParamFromDocStrings

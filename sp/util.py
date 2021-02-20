@@ -4,7 +4,7 @@ import re
 import textwrap
 
 import six
-import solace_semp_client
+import solace_semp_config
 import yaml
 
 logger = logging.getLogger('solace-provision')
@@ -13,13 +13,13 @@ primitive = ("int", "str", "bool")
 
 
 def getClient(settings=None):
-    config = solace_semp_client.Configuration()
+    config = solace_semp_config.Configuration()
 
     config.host = settings.SOLACE_CONFIG["host"]
     config.username = settings.SOLACE_CONFIG["username"]
     config.password = settings.SOLACE_CONFIG["password"]
 
-    client = solace_semp_client.ApiClient(configuration=config)
+    client = solace_semp_config.ApiClient(configuration=config)
     return client
 
 
