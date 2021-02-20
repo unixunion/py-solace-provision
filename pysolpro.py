@@ -4,6 +4,12 @@
 import logging
 import sys
 
+try:
+    import coloredlogs
+    coloredlogs.install()
+except ImportError as e:
+    pass
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
@@ -53,7 +59,8 @@ if __name__ == '__main__':
     try:
         import argcomplete
         apc = ArgParserCache()
-        subparsers = apc.generate_parser(subparsers)
+        #subparsers = apc.generate_parser(subparsers)
+        subparsers = apc.load(subparsers)
         argcomplete.autocomplete(parser)
     except Exception as e:
         logger.error("auto complete error: %s" % e)
@@ -66,6 +73,10 @@ if __name__ == '__main__':
         ]
 
         [active_modules.append(m(subparsers, client_resolver)) for m in sp_modules]
+
+        # maybe generate cache for argparse
+        apc = ArgParserCache()
+        apc.populate(parser)
 
         args = parser.parse_args()
         from solace_semp_config.rest import ApiException

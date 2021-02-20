@@ -1,5 +1,6 @@
 import logging
 import pickle
+from argparse import ArgumentParser
 
 logger = logging.getLogger('solace-provision')
 logger.debug("imported")
@@ -7,32 +8,69 @@ logger.debug("imported")
 
 class ArgParserCache:
     loaded = False
-
     subparsers = {}
     cache = {}
-    cache_file_name = "pySolPro.cache"
+    cache_file_name = "pysolpro.cache"
 
     def __init__(self, do_load=True):
         # check if cache is on disk, and load it, otherwise set loaded state to false
         if do_load:
-            with open(self.cache_file_name, mode='rb') as f:
-                logger.debug("loading cache")
-                self.cache = pickle.load(f)
-                self.loaded = True
+            try:
+                with open(self.cache_file_name, mode='rb') as f:
+                    logger.debug("loading cache")
+                    self.cache = pickle.load(f)
+                    self.loaded = True
+            except FileNotFoundError as e:
+                pass
 
-    # def add_sub_command(self, subcommand):
-    #     self.subcommands.append(subcommand)
-
-    def is_loaded(self):
+    def is_losaded(self):
         return self.loaded
 
-    def add_subparser(self, command, subparsers):
-        if not self.loaded:
-            self.subparsers[command] = {"subparser": subparsers}
+    def populate(self, parser: ArgumentParser):
 
-    def get_subparsers(self, command):
-        if not self.loaded:
-            return self.subparsers[command]["subparser"]
+        if self.loaded:
+            return
+
+        data = {}
+
+        try:
+            logger.info("populating wit %s" % parser)
+            t = parser._actions[1].choices
+            for subcommand in t:
+                data[subcommand] = {}
+                choices = t[subcommand]._actions[1].choices
+                for choice in choices:
+                    logger.debug(choice)
+                    data[subcommand][choice] = []
+                    for opt in choices[choice]._actions:
+                        if opt.option_strings[0] != "-h":
+                            data[subcommand][choice].append((opt.option_strings[0], opt.dest, opt.help, 'str'))
+
+            with open(self.cache_file_name, mode="wb") as f:
+                pickle.dump(data, f)
+                f.close()
+
+
+        except Exception as e:
+            logger.error("error: %s" % e)
+
+    def load(self, subparser):
+        for subcommand in self.cache:
+            logger.debug("sc: %s" % subcommand)
+            subc = subparser.add_parser(subcommand).add_subparsers()
+
+            for cmd in self.cache[subcommand]:
+                logger.debug(cmd)
+                tmp_group = subc.add_parser(cmd)
+                # todo fixme only supports single argument name, not the list of long --name and short -n
+                for param in self.cache[subcommand][cmd]:
+                    if param[0] != "-h":
+                        t = param
+                        opt = "%s" % t[0]
+                        help = t[2]
+                        y = tmp_group.add_argument(opt, action="store", type=str, help=help)
+
+        return subparser
 
     def make_cache(self):
         if not self.loaded:
