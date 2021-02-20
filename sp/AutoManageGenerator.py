@@ -72,7 +72,7 @@ class AutoManageGenerator(object):
                                                                                 )))
 
                 logger.debug("loaded")
-                self.arg_parser_cache.make_cache()
+                #self.arg_parser_cache.make_cache()
 
     # this is not yet used, it will be used to parse doc strings
     # for additional kwargs not identified in the signature
@@ -95,62 +95,62 @@ class AutoManageGenerator(object):
     @staticmethod
     def autoSubCommandArgParser(subparsers=None, command=None, apiclass=None, callback=None, arg_parser_cache=None):
 
-        if not arg_parser_cache.is_loaded():
+        # if not arg_parser_cache.is_loaded():
 
-            logger.debug("cache is not loaded, getting methods")
-            object_methods = [method_name for method_name in dir(apiclass)
-                              if callable(getattr(apiclass, method_name)) and not method_name.startswith(
-                    "__") and not method_name.endswith("with_http_info")]
-            logger.debug("got methods")
+        logger.debug("cache is not loaded, getting methods")
+        object_methods = [method_name for method_name in dir(apiclass)
+                          if callable(getattr(apiclass, method_name)) and not method_name.startswith(
+                "__") and not method_name.endswith("with_http_info")]
+        logger.debug("got methods")
 
-            logger.debug(object_methods)
+        logger.debug(object_methods)
 
-            # holder for groups
-            groups = []
+        # holder for groups
+        groups = []
 
-            # inspect.getfullargspec(a_method)
-            for method_name in object_methods:
-                logger.debug("method: %s " % method_name)
+        # inspect.getfullargspec(a_method)
+        for method_name in object_methods:
+            logger.debug("method: %s " % method_name)
 
-                # create the "method" subparser, sucking the dock strings into the help kwarg
-                tmpGroup = subparsers.add_parser(method_name, help=getattr(apiclass, method_name).__doc__)
+            # create the "method" subparser, sucking the dock strings into the help kwarg
+            tmpGroup = subparsers.add_parser(method_name, help=getattr(apiclass, method_name).__doc__)
 
-                # add to the arg cacher
-                # arg_parser_cache.add_parser(command, method_name, help=getattr(apiclass, method_name).__doc__)
+            # add to the arg cacher
+            # arg_parser_cache.add_parser(command, method_name, help=getattr(apiclass, method_name).__doc__)
 
-                # set the callback for the subparser group, using the CallFixer to resolve the callback
-                tmpGroup.set_defaults(func=CallProxy(getattr(callback, method_name)))
+            # set the callback for the subparser group, using the CallFixer to resolve the callback
+            tmpGroup.set_defaults(func=CallProxy(getattr(callback, method_name)))
 
-                # add the default to the cacher
-                # arg_parser_cache.add_default(command, apiclass, method_name)
-                logger.debug("\tparameters: %s" % inspect.signature(getattr(apiclass, method_name)))
+            # add the default to the cacher
+            # arg_parser_cache.add_default(command, apiclass, method_name)
+            logger.debug("\tparameters: %s" % inspect.signature(getattr(apiclass, method_name)))
 
-                AutoManageGenerator.getArgsForMethod(apiclass, method_name)
+            AutoManageGenerator.getArgsForMethod(apiclass, method_name)
 
-                # get the signature of the method
-                sig = inspect.signature(getattr(apiclass, method_name))
+            # get the signature of the method
+            sig = inspect.signature(getattr(apiclass, method_name))
 
-                # for each parameter, check its type, and add to the subparsers as needed
-                for param in sig.parameters.values():
-                    if param.name != "self" and param.name != "kwargs":
+            # for each parameter, check its type, and add to the subparsers as needed
+            for param in sig.parameters.values():
+                if param.name != "self" and param.name != "kwargs":
 
-                        # get the type of the param from the doc strings
-                        param_type = getTypeParamFromDocStrings(getattr(apiclass, method_name), param)
-                        if is_primitive(param_type):
-                            logger.debug("adding param: %s type: %s" % (param.name, param_type))
-                            tmpGroup.add_argument("--%s" % param, action="store", type=str,
-                                                  help="type: %s" % param_type)
-                        else:
-                            logger.debug("ignoring %s because it is a non-primitive" % param_type)
-                            tmpGroup.add_argument("--%s" % param, action="store", type=str,
-                                                  help="file: %s" % param_type)
-                # add override values for arbitrary key/value changing of body of yaml for update events
-                tmpGroup.add_argument("--override", nargs=2, action="append", type=str,
-                                      help="key,val in yaml to override, such as enabled false")
-                groups.append(tmpGroup)  # this is probably not needed
-            logger.debug("created sub-parsers")
-            arg_parser_cache.add_subparser(command, subparsers)
-            return subparsers
+                    # get the type of the param from the doc strings
+                    param_type = getTypeParamFromDocStrings(getattr(apiclass, method_name), param)
+                    if is_primitive(param_type):
+                        logger.debug("adding param: %s type: %s" % (param.name, param_type))
+                        tmpGroup.add_argument("--%s" % param, action="store", type=str,
+                                              help="type: %s" % param_type)
+                    else:
+                        logger.debug("ignoring %s because it is a non-primitive" % param_type)
+                        tmpGroup.add_argument("--%s" % param, action="store", type=str,
+                                              help="file: %s" % param_type)
+            # add override values for arbitrary key/value changing of body of yaml for update events
+            tmpGroup.add_argument("--override", nargs=2, action="append", type=str,
+                                  help="key,val in yaml to override, such as enabled false")
+            groups.append(tmpGroup)  # this is probably not needed
+        logger.debug("created sub-parsers")
+        #arg_parser_cache.add_subparser(command, subparsers)
+        return subparsers
 
-        else:
-            return arg_parser_cache.get_subparsers(command)
+        # else:
+        #     return arg_parser_cache.get_subparsers(command)
