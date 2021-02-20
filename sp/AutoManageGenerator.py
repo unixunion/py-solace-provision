@@ -91,7 +91,7 @@ class AutoManageGenerator(object):
                         current_group.add_argument("--%s" % param, action="store", type=str,
                                                    help="file: %s" % param_type)
             # add override values for arbitrary key/value changing of body of yaml for update events
-            groups[len(groups) - 1].add_argument("--override", nargs=2, action="store", type=str,
+            groups[len(groups) - 1].add_argument("--override", nargs=2, action="append", type=str,
                                                  help="key,val in yaml to override, such as enabled false")
         logger.debug("created sub-parsers")
         return subparsers

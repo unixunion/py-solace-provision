@@ -52,16 +52,19 @@ class CallProxy(object):
                             file = yaml.safe_load(f)
             for k, v in a._get_kwargs():
                 if k == "override" and v is not None:
-                    logger.debug("overriding %s %s" % (v[0], v[1]))
-                    logger.debug("file[v0]: %s" % file[v[0]])
-                    # convert the value type to whatever is in there,
-                    # TODO FIXME this is probably not None / null safe
-                    if isinstance(file[v[0]], bool):
-                        file[v[0]] = str2bool(v[1])
-                    else:
-                        file[v[0]] = v[1]
-                    logger.debug("file[v0]: %s" % file[v[0]])
-                    break
+                    logger.info("v: %s" % v)
+                    for attrib, value in v:
+                        logger.info("overriding a: %s, v: %s" % (attrib, value))
+                        #logger.debug("overriding %s %s" % (v[0], v[1]))
+                        #logger.debug("file[v0]: %s" % file[v[0]])
+                        # convert the value type to whatever is in there,
+                        # TODO FIXME this is probably not None / null safe
+                        if isinstance(file[attrib], bool):
+                            file[attrib] = str2bool(value)
+                        else:
+                            file[attrib] = value
+                        logger.debug("file[%s]: %s" % (attrib, value))
+
 
         if file is not None:
             function_args.append(file)

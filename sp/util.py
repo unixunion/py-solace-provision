@@ -24,22 +24,28 @@ def getClient(settings=None):
 
 
 # process output, and recurs if cursor is in response
-def processOutput(target_method, args, **kwargs):
+def processOutput(target_method, args, callback=None, **kwargs):
     data = target_method(args, **kwargs)
 
     if (isinstance(data.data, list)):
         logger.debug("list response")
         for i in data.data:
             logger.info("response data\n%s" % yaml.dump(to_good_dict(i)))
+            if callback:
+                callback(yaml.dump(to_good_dict(i)))
 
     else:
         logger.debug("single response")
         logger.info("response data\n%s" % yaml.dump(to_good_dict(data.data)))
+        if callback:
+            callback(yaml.dump(to_good_dict(data.data)))
 
     cursor = getCursor(data)
     if cursor:
         logger.debug("cursor is present")
-        processOutput(target_method, args, cursor=cursor)
+        processOutput(target_method, args, cursor=cursor, callback=callback)
+
+    return data
 
 
 # simple comparator for simple types

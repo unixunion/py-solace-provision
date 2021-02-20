@@ -76,3 +76,10 @@ Add the appropriate model, and API into the "klasses" field of the AutoManageGen
 ### Tab completion
 
 Install https://kislyuk.github.io/argcomplete/
+
+### Notes 
+
+#### Using the nw client
+
+./server.py
+./client.py get_msg_vpn_queues --msg_vpn_name default |grep queueName | awk -F ": " '{print $2;}' | xargs -I{} ./client.py get_msg_vpn_queue_subscriptions --msg_vpn_name default --queue {}
