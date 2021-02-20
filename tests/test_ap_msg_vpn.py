@@ -2,7 +2,7 @@ import argparse
 import logging
 from unittest import TestCase
 
-import solace_semp_client
+import solace_semp_config
 
 from sp.AutoManageGenerator import AutoManageGenerator
 from tests.commontest import getClient
@@ -27,7 +27,7 @@ class TestApMsgVpn(TestCase):
 
     def setUp(self):
         client = getClient()
-        api = solace_semp_client.MsgVpnApi(api_client=client)
+        api = solace_semp_config.MsgVpnApi(api_client=client)
 
         self.parser = argparse.ArgumentParser(prog='pySolPro')
         subparsers = self.parser.add_subparsers(help='sub-command help')

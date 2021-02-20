@@ -1,16 +1,16 @@
-import solace_semp_client
+import solace_semp_config
 
 from sp.util import getCursor
 
 
 def getClient():
-    config = solace_semp_client.Configuration()
+    config = solace_semp_config.Configuration()
     config.host = "http://localhost:8080/SEMP/v2/config"
     config.username = "admin"
     config.password = "admin"
     config.proxy = "http://localhost:5555"
 
-    client = solace_semp_client.ApiClient(configuration=config)
+    client = solace_semp_config.ApiClient(configuration=config)
     return client
 
 
