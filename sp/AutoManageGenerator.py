@@ -1,10 +1,12 @@
 import inspect
 import logging
-from argparse import ArgumentParser
 
+import solace_semp_action
+import solace_semp_config
+import solace_semp_monitor
+from solace_semp_action import AllApi as ActionAllApi
 from solace_semp_config import AllApi as ConfigAllApi
 from solace_semp_monitor import AllApi as MonitorAllApi
-from solace_semp_action import AllApi as ActionAllApi
 
 from sp.CallProxy import CallProxy
 from sp.util import is_primitive, getTypeParamFromDocStrings
@@ -18,24 +20,43 @@ class AutoManageGenerator(object):
     name = "vpn"
     help = "vpn help text..."
 
+    # fixme, if parser already has a subcommand in mind, then we dont need to import all of these
     klasses = [
-        {"api": ConfigAllApi, "command": "config"},
-        {"api": MonitorAllApi, "command": "monitor"},
-        {"api": ActionAllApi, "command": "action"}
+        {
+            "api": ConfigAllApi,
+            "subcommand": "config",
+            "config_class": solace_semp_config.Configuration,
+            "client_class": solace_semp_config.ApiClient
+        },
+        {
+            "api": MonitorAllApi,
+            "subcommand": "monitor",
+            "config_class": solace_semp_monitor.Configuration,
+            "client_class": solace_semp_monitor.ApiClient
+        },
+        {
+            "api": ActionAllApi,
+            "subcommand": "action",
+            "config_class": solace_semp_action.Configuration,
+            "client_class": solace_semp_action.ApiClient
+        }
     ]
 
     parsers = []
 
-    def __init__(self, subparsers, api_client):
+    def __init__(self, subparsers, client_resolver):
         if subparsers:
             for provider_api in self.klasses:
-                subp = subparsers.add_parser(provider_api["command"])
-
-                #self.parsers.append(subp)
-                self.parsers.append(self.autoSubCommandArgParser(subparsers=subp.add_subparsers(),
-                                                                 apiclass=provider_api["api"],
-                                                                 callback=provider_api["api"](
-                                                                     api_client=api_client)))
+                subp = subparsers.add_parser(provider_api["subcommand"])
+                self.parsers.append(AutoManageGenerator.autoSubCommandArgParser(subparsers=subp.add_subparsers(),
+                                                                                apiclass=provider_api["api"],
+                                                                                callback=provider_api["api"](
+                                                                                    api_client=client_resolver(
+                                                                                        subcommand=provider_api["subcommand"],
+                                                                                        config_class=provider_api["config_class"],
+                                                                                        client_class=provider_api["client_class"]
+                                                                                    )
+                                                                                )))
 
     # this is not yet used, it will be used to parse doc strings
     # for additional kwargs not identified in the signature
@@ -55,7 +76,8 @@ class AutoManageGenerator(object):
         logger.debug(params)
 
     # dynamically create the argparser command line options at runtime
-    def autoSubCommandArgParser(self, subparsers=None, apiclass=None, callback=None):
+    @staticmethod
+    def autoSubCommandArgParser(subparsers=None, apiclass=None, callback=None):
         logger.debug("getting methods")
         object_methods = [method_name for method_name in dir(apiclass)
                           if callable(getattr(apiclass, method_name)) and not method_name.startswith(

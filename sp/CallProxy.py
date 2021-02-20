@@ -47,9 +47,13 @@ class CallProxy(object):
                         logger.debug("adding primitive: %s arg: %s" % (dt, v))
                         function_args.append(v)
                     elif dt is not None:
-                        logger.debug("read file for type: %s arg: %s" % (dt, v))
+                        logger.debug("reading file for type: %s arg: %s" % (dt, v))
                         with open(v) as f:
                             file = yaml.safe_load(f)
+                            if file is None:
+                                logger.debug("empty file, making empty instance")
+                                file = {}
+                            logger.debug("read file %s" % file)
             for k, v in a._get_kwargs():
                 if k == "override" and v is not None:
                     logger.info("v: %s" % v)

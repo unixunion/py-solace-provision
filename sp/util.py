@@ -4,28 +4,35 @@ import re
 import textwrap
 
 import six
-import solace_semp_config
 import yaml
+
+import sp.settingsloader as settings
 
 logger = logging.getLogger('solace-provision')
 
 primitive = ("int", "str", "bool")
 
 
-def getClient(settings=None):
-    config = solace_semp_config.Configuration()
+def getClient(subcommand=None, config_class=None, client_class=None):
 
-    config.host = settings.SOLACE_CONFIG["host"]
-    config.username = settings.SOLACE_CONFIG["username"]
-    config.password = settings.SOLACE_CONFIG["password"]
+    config = config_class()
 
-    client = solace_semp_config.ApiClient(configuration=config)
+    config.host = settings.SOLACE_CONFIG[subcommand]["host"]
+    config.username = settings.SOLACE_CONFIG[subcommand]["username"]
+    config.password = settings.SOLACE_CONFIG[subcommand]["password"]
+
+    client = client_class(configuration=config)
+
     return client
 
 
 # process output, and recurs if cursor is in response
+# todo fixme this should not make assumptions about the data type
 def processOutput(target_method, args, callback=None, **kwargs):
     data = target_method(args, **kwargs)
+
+    logger.debug("data: %s" % data)
+    #logger.debug("no data, could be semp meta only")
 
     if (isinstance(data.data, list)):
         logger.debug("list response")

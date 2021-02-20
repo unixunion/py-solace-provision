@@ -15,9 +15,9 @@ from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, processOutput, g
 import sp.settingsloader as settings
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.INFO)
+handler.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -31,11 +31,11 @@ sp_modules = [
 active_modules = []
 
 if __name__ == '__main__':
-    client = getClient(settings=settings)
+    client_resolver = getClient
 
     parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
     subparsers = parser.add_subparsers(help='sub-command help')
-    [active_modules.append(m(subparsers, client)) for m in sp_modules]
+    [active_modules.append(m(subparsers, client_resolver)) for m in sp_modules]
     try:
         argcomplete.autocomplete(parser)
     except Exception as e:
