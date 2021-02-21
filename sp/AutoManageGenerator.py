@@ -72,7 +72,7 @@ class AutoManageGenerator(object):
                                                                                 )))
 
                 logger.debug("loaded")
-                #self.arg_parser_cache.make_cache()
+                # self.arg_parser_cache.make_cache()
 
     # this is not yet used, it will be used to parse doc strings
     # for additional kwargs not identified in the signature
@@ -148,12 +148,15 @@ class AutoManageGenerator(object):
             tmpGroup.add_argument("--override", nargs=2, action="append", type=str,
                                   help="key,val in yaml to override, such as enabled false")
 
-            tmpGroup.add_argument("--where", nargs=1, action="append", type=str,
-                                  help="where filter to apply, e.g: msgVpnName==def*")
+            #if method_name.startswith("get_"):
+            x = getTypeParamFromDocStrings(getattr(apiclass, method_name), "where")
+            if x:
+                tmpGroup.add_argument("--where", nargs=1, action="append", type=str,
+                                      help="where filter to apply, e.g: msgVpnName==def*")
 
             groups.append(tmpGroup)  # this is probably not needed
         logger.debug("created sub-parsers")
-        #arg_parser_cache.add_subparser(command, subparsers)
+        # arg_parser_cache.add_subparser(command, subparsers)
         return subparsers
 
         # else:

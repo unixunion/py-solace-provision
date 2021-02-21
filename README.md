@@ -25,7 +25,6 @@ Most commands work with some limitations.
 
 1. Delete does NOT work, because python sends a "empty" body to Solace, which expects NO body whatsover. 
 2. --where only supports ONE where parameter, due to solace not accepting %2C encoded ","
-3. --where is listed everywhere as a possible argument, but in reality should only be used for "get_*" or similar methods which retrieve data.
 
 ## Setup
 
