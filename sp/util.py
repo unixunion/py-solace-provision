@@ -13,6 +13,14 @@ logger = logging.getLogger('solace-provision')
 primitive = ("int", "str", "bool")
 
 
+def load_class(klassname):
+    try:
+        __import__(klassname, globals())
+    except Exception as e:
+        logging.error("Failed to import class %s" % klassname)
+        raise
+
+
 def getClient(subcommand=None, config_class=None, client_class=None):
     """
     Creates a client of the type for the passed parameters.
@@ -25,12 +33,12 @@ def getClient(subcommand=None, config_class=None, client_class=None):
     """
     config = config_class()
 
-    config.host = settings.SOLACE_CONFIG[subcommand]["host"]
-    config.username = settings.SOLACE_CONFIG[subcommand]["username"]
-    config.password = settings.SOLACE_CONFIG[subcommand]["password"]
-    if "proxy" in settings.SOLACE_CONFIG:
+    config.host = settings.solace_config[subcommand]["host"]
+    config.username = settings.solace_config[subcommand]["username"]
+    config.password = settings.solace_config[subcommand]["password"]
+    if "proxy" in settings.solace_config:
         logger.info("setting proxy")
-        config.proxy = settings.SOLACE_CONFIG["proxy"]
+        config.proxy = settings.solace_config["proxy"]
 
     client = client_class(configuration=config)
 
