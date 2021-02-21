@@ -20,13 +20,24 @@ class CallProxy(object):
 
     def __call__(self, *args, **kwargs):
         logger.debug("called for target %s, args: %s kwargs: %s" % (self.target, args, kwargs))
-        new_args = self.resolveArgs(self.target, args)
-        if "cursor" in kwargs:
-            logger.debug("cursor: %s" % kwargs.get("cursor"))
-            return self.target.__call__(*new_args, cursor=kwargs.get("cursor"))
-        else:
-            logger.debug("no cursor call")
-            return self.target.__call__(*new_args)
+        new_args, new_kwargs = self.resolveArgs(self.target, args)
+
+        cursor = kwargs.get("cursor")
+        where = new_kwargs.get("where")
+
+        if cursor and where:
+            return self.target.__call__(*new_args, cursor=cursor, where=where)
+        elif cursor:
+            return self.target.__call__(*new_args, cursor=cursor)
+        elif where:
+            return self.target.__call__(*new_args, where=where)
+        #
+        # if "cursor" in kwargs:
+        #     logger.debug("cursor: %s" % kwargs.get("cursor"))
+        #     return self.target.__call__(*new_args, cursor=kwargs.get("cursor"))
+        # else:
+        #     logger.debug("no cursor call")
+        #     return self.target.__call__(*new_args)
 
     def getInstance(self):
         return self.api_instance
@@ -36,12 +47,13 @@ class CallProxy(object):
         logger.debug("resolving args %s" % args)
 
         function_args = []
+        function_kwargs = {}
         file = None
 
         for a in args:
             logger.debug("a: %s", a)
             for k, v in a._get_kwargs():
-                if not isinstance(v, CallProxy) and k != "override" and v is not None:
+                if not isinstance(v, CallProxy) and k != "override" and k != "where" and v is not None:
                     logger.debug("key: %s, argument: %s" % (k, v))
                     dt = getTypeParamFromDocStrings(method, k)
                     if is_primitive(dt):
@@ -57,11 +69,11 @@ class CallProxy(object):
                             logger.debug("read file %s" % file)
             for k, v in a._get_kwargs():
                 if k == "override" and v is not None:
-                    logger.info("v: %s" % v)
+                    logger.debug("v: %s" % v)
                     for attrib, value in v:
                         logger.info("overriding a: %s, v: %s" % (attrib, value))
-                        #logger.debug("overriding %s %s" % (v[0], v[1]))
-                        #logger.debug("file[v0]: %s" % file[v[0]])
+                        # logger.debug("overriding %s %s" % (v[0], v[1]))
+                        # logger.debug("file[v0]: %s" % file[v[0]])
                         # convert the value type to whatever is in there,
                         # TODO FIXME this is probably not None / null safe
                         if isinstance(file[attrib], bool):
@@ -69,10 +81,17 @@ class CallProxy(object):
                         else:
                             file[attrib] = value
                         logger.debug("file[%s]: %s" % (attrib, value))
+                if k == "where" and v is not None:
+                    logger.info("where v: %s" % v)
+                    new_where = []
+                    for select in v:
+                        new_where.append(select[0])
+                    logger.info("new_where: %s" % new_where)
+                    function_kwargs["where"] = new_where
 
 
         if file is not None:
             function_args.append(file)
 
         logger.debug("returning args")
-        return function_args
+        return function_args, function_kwargs

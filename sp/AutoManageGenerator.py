@@ -147,6 +147,10 @@ class AutoManageGenerator(object):
             # add override values for arbitrary key/value changing of body of yaml for update events
             tmpGroup.add_argument("--override", nargs=2, action="append", type=str,
                                   help="key,val in yaml to override, such as enabled false")
+
+            tmpGroup.add_argument("--where", nargs=1, action="append", type=str,
+                                  help="where filter to apply, e.g: msgVpnName==def*")
+
             groups.append(tmpGroup)  # this is probably not needed
         logger.debug("created sub-parsers")
         #arg_parser_cache.add_subparser(command, subparsers)
