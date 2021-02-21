@@ -17,6 +17,8 @@ Example:
         --override dmrEnabled false \
         --override enavled false
 
+    pysolpro.py action get_msg_vpns --where enabled==false
+
 ## Setup
 
 Create the a virtualenvironment for this
