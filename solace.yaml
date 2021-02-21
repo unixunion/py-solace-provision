@@ -12,6 +12,7 @@ SOLACE_CONFIG:
     host: http://localhost:8080/SEMP/v2/action
     username: admin
     password: admin
+  #proxy: http://localhost:5555
 
 SERVER:
   host: 127.0.0.1

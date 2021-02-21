@@ -5,7 +5,7 @@ create, update and delete Solace managed objects.
 
 Example:
 
-    pysolpro.py [config|monitor|action] --help
+    pysolpro.py [config|monitor|action] --help  
 
     pysolpro.py config create_msg_vpn --body data/vpn.yaml
 
@@ -21,7 +21,7 @@ Example:
 
 ## Setup
 
-Create the a virtualenvironment for this
+Create a virtual environment for this
 
     python3 -m venv ~/spvenv
     source ~/spvenv/bin/activate
@@ -42,15 +42,42 @@ Install PyYAML
 
 ## Running
 
-    python pysolpro.py --help
-    
-### Manageing objects
-
 Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are 
 labeled in the help as being file: Class. These must have the body argument provide a path to a YAML file.
 
     python pysolpro.py config create_dmr_cluster --help
     python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
+
+#### Special parameters
+
+##### override
+
+When creating/updating existing objects on the appliance, you can override any of the on-disk YAML fields by appending 
+`--override key val`. For example if you want to change the enabled state of a MessageVPN.
+
+    ./pysolpro.py config --update_msg_vpn --msg_vpn_name default --body default-vpn.yaml --override enabled false
+
+##### where
+
+Include in the response only objects where certain conditions are true. Use this query parameter to limit which objects 
+are returned to those whose attribute values meet the given conditions.
+
+The value of where is a comma-separated list of expressions. All expressions must be true for the object to be included 
+in the response. Each expression takes the form:
+
+expression  = attribute-name OP value
+OP          = '==' | '!=' | '&lt;' | '&gt;' | '&lt;=' | '&gt;='
+
+value may be a number, string, true, or false, as appropriate for the type of attribute-name. Greater-than and less-than 
+comparisons only work for numbers. A * in a string value is interpreted as a wildcard (zero or more characters).
+
+Note, only one where condition is supported at the moment, due to Solace not using OpenAPI3. OpenAPI2 does not have `allowReserved`
+keyword in the parameter specification, so the `,` separator is encoded to %2C.
+
+Example:
+
+    ./pysolpro.py config --get_msg_vpn_queues --msg_vpn_name default --where "queueName==B*"
+
 
 ### Changing the state of something
 

@@ -31,6 +31,8 @@ class CallProxy(object):
             return self.target.__call__(*new_args, cursor=cursor)
         elif where:
             return self.target.__call__(*new_args, where=where)
+        else:
+            return self.target.__call__(*new_args)
         #
         # if "cursor" in kwargs:
         #     logger.debug("cursor: %s" % kwargs.get("cursor"))
@@ -88,7 +90,6 @@ class CallProxy(object):
                         new_where.append(select[0])
                     logger.info("new_where: %s" % new_where)
                     function_kwargs["where"] = new_where
-
 
         if file is not None:
             function_args.append(file)
