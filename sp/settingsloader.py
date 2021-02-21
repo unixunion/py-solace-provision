@@ -3,6 +3,8 @@ import os
 
 import yaml
 
+logger = logging.getLogger("solace-provision")
+
 primary_config = 'solace.yaml',
 
 try:
@@ -30,7 +32,6 @@ Examples:
 
 """
 
-logging = logging.getLogger("solace-provision")
 yaml_loaded = False
 
 # defaults which are set / could not be present
@@ -47,7 +48,7 @@ for yaml_file in __yamlfiles__:
     if not os.path.exists(yaml_file):
         continue
 
-    logging.info("Using yaml file %s" % yaml_file)
+    logger.info("Using yaml file %s" % yaml_file)
     stream = open(yaml_file, 'r')
     yaml_settings = yaml.safe_load(stream)
 

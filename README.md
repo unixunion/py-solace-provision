@@ -77,9 +77,21 @@ Add the appropriate model, and API into the "klasses" field of the AutoManageGen
         {"api": ActionAllApi, "command": "action"}
     ]
 
-### Tab completion
+### Optional Extras
+#### Tab completion
 
-Install https://kislyuk.github.io/argcomplete/
+pySolPro supports tab completion, and will create a cache file named pysolpro.cache upon first invocation. 
+see https://kislyuk.github.io/argcomplete/ for more info
+
+    pip install argcomplete
+
+For zsh:
+
+    eval "$(register-python-argcomplete pysolpro.py)"
+
+#### Colourized logs
+
+    pip install coloredlogs
 
 ### Notes 
 

@@ -23,9 +23,6 @@ class ArgParserCache:
             except FileNotFoundError as e:
                 pass
 
-    def is_losaded(self):
-        return self.loaded
-
     def populate(self, parser: ArgumentParser):
 
         if self.loaded:
@@ -34,7 +31,7 @@ class ArgParserCache:
         data = {}
 
         try:
-            logger.info("populating wit %s" % parser)
+            logger.info("populating cache from parser: %s" % parser)
             t = parser._actions[1].choices
             for subcommand in t:
                 data[subcommand] = {}

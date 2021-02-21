@@ -10,12 +10,11 @@ try:
 except ImportError as e:
     pass
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger = logging.getLogger("solace-provision")
+# logger.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
 handler.setLevel(logging.INFO)
-formatter = logging.Formatter(
-    '%(asctime)s - %(name)s[%(filename)s:%(lineno)d->%(funcName)20s()] - %(levelname)s - %(message)s')
+formatter = logging.Formatter()
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -24,13 +23,6 @@ import argparse
 from sp.ArgParseCache import ArgParserCache
 from sp.SolaceResponseProcessor import SolaceResponseProcessor
 from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, getClient, genericOutputProcessor
-
-# try:
-#     import argcomplete
-#     # todo fixme, make the argcompletion use a cached version of the argparser namespaces
-# except ModuleNotFoundError as e:
-#     print("argcomplete is not available, tab completion disabled")
-
 
 # populated at runtime
 active_modules = []
