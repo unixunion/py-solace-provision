@@ -104,15 +104,47 @@ if __name__ == '__main__':
             logger.error("error: %s" % e)
             raise
 
-        # import this here because its slow, and we don't want to impede the autocompleter
-        from sp.AutoManageGenerator import AutoManageGenerator
+        logger.info("initializing all modules")
 
+        # import this here because its slow, and we don't want to impede the autocompleter
+        # from sp.AutoManageGenerator import AutoManageGenerator
+        from sp.AutoApi import AutoApi
         # list of "plugins" to load
         sp_modules = [
-            AutoManageGenerator
+            AutoApi
         ]
 
-        [active_modules.append(m(subparsers, client_resolver)) for m in sp_modules]
+
+        import solace_semp_action
+        import solace_semp_config
+        import solace_semp_monitor
+        from solace_semp_action import AllApi as ActionAllApi
+        from solace_semp_config import AllApi as ConfigAllApi
+        from solace_semp_monitor import AllApi as MonitorAllApi
+
+        # fixme, if parser already has a subcommand in mind, then we dont need to import all of these
+        klasses = [
+            {
+                "api": ConfigAllApi,
+                "subcommand": "config",
+                "config_class": solace_semp_config.Configuration,
+                "client_class": solace_semp_config.ApiClient
+            },
+            {
+                "api": MonitorAllApi,
+                "subcommand": "monitor",
+                "config_class": solace_semp_monitor.Configuration,
+                "client_class": solace_semp_monitor.ApiClient
+            },
+            {
+                "api": ActionAllApi,
+                "subcommand": "action",
+                "config_class": solace_semp_action.Configuration,
+                "client_class": solace_semp_action.ApiClient
+            }
+        ]
+
+        [active_modules.append(m(subparsers, client_resolver, klasses=klasses)) for m in sp_modules]
 
         # maybe generate cache for argparse
         apc = ArgParserCache()
