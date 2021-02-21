@@ -32,7 +32,8 @@ Generate the python-config API for the version of the appliance you need using h
     git clone https://github.com/unixunion/solace_semp_client.git
     cd solace_semp_client
     ./build.sh python 9.8.0.12
-    cd output/python_config
+    # for each dir of python_config, python_monitor, python_action
+    cd output/${dir}
     # be sure you activated the venv above! 
     python setup.py install
 
