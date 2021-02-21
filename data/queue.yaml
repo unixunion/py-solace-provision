@@ -1,0 +1,32 @@
+---
+accessType: exclusive
+consumerAckPropagationEnabled: true
+deadMsgQueue: '#DEAD_MSG_QUEUE'
+deliveryCountEnabled: false
+egressEnabled: true
+eventBindCountThreshold:
+  clearPercent: 60
+  setPercent: 80
+eventMsgSpoolUsageThreshold:
+  clearPercent: 60
+  setPercent: 80
+eventRejectLowPriorityMsgLimitThreshold:
+  clearPercent: 60
+  setPercent: 80
+ingressEnabled: true
+maxBindCount: 1000
+maxDeliveredUnackedMsgsPerFlow: 10000
+maxMsgSize: 10000000
+maxMsgSpoolUsage: 1500
+maxRedeliveryCount: 0
+maxTtl: 0
+msgVpnName: default
+owner: ''
+permission: consume
+queueName: test
+redeliveryEnabled: true
+rejectLowPriorityMsgEnabled: false
+rejectLowPriorityMsgLimit: 0
+rejectMsgToSenderOnDiscardBehavior: when-queue-enabled
+respectMsgPriorityEnabled: false
+respectTtlEnabled: false
