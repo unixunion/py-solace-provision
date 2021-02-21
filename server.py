@@ -65,7 +65,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 if __name__ == '__main__':
     client_resolver = getClient
 
-    parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter, exit_on_error=False)
+    parser = argparse.ArgumentParser(prog='pySolPro',
+                                     formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter) # exit_on_error=False
     def x():
         pass
     parser.__setattr__("exit", x)

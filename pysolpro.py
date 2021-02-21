@@ -10,13 +10,15 @@ try:
 except ImportError as e:
     pass
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
 logger = logging.getLogger("solace-provision")
-# logger.setLevel(logging.INFO)
-handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter()
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+# logger.setLevel(logging.DEBUG)
+# handler = logging.StreamHandler(sys.stdout)
+# handler.setLevel(logging.INFO)
+# formatter = logging.Formatter()
+# handler.setFormatter(formatter)
+# logger.addHandler(handler)
 
 import argparse
 

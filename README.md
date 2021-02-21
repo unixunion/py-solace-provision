@@ -9,10 +9,7 @@ Example:
 
     pysolpro.py config create_msg_vpn --body data/vpn.yaml
 
-    pysolpro.py config update_msg_vpn \
-        --msg_vpn_name myvpn \
-        --body data/vpn.yaml \
-        --override enabled false
+    pysolpro.py action do_msg_vpn_clear_stats --msg_vpn_name default --body data/empty.yaml
 
     pysolpro.py config update_msg_vpn \
         --msg_vpn_name myvpn \
