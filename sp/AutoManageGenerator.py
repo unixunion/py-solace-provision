@@ -56,11 +56,11 @@ class AutoManageGenerator(object):
                 # subp = self.arg_parser_cache.init_subparsers(provider_api["subcommand"], subparsers)
                 subp = subparsers.add_parser(provider_api["subcommand"]).add_subparsers()
                 # self.arg_parser_cache.add_subparser(provider_api["subcommand"], subp) # add to the cache
-                self.parsers.append(AutoManageGenerator.autoSubCommandArgParser(subparsers=subp,
-                                                                                command=provider_api["subcommand"],
-                                                                                apiclass=provider_api["api"],
-                                                                                arg_parser_cache=self.arg_parser_cache,
-                                                                                callback=provider_api["api"](
+                self.parsers.append(AutoManageGenerator.auto_sub_command_arg_parser(subparsers=subp,
+                                                                                    command=provider_api["subcommand"],
+                                                                                    apiclass=provider_api["api"],
+                                                                                    arg_parser_cache=self.arg_parser_cache,
+                                                                                    callback=provider_api["api"](
                                                                                     api_client=client_resolver(
                                                                                         subcommand=provider_api[
                                                                                             "subcommand"],
@@ -93,7 +93,7 @@ class AutoManageGenerator(object):
 
     # dynamically create the argparser command line options at runtime
     @staticmethod
-    def autoSubCommandArgParser(subparsers=None, command=None, apiclass=None, callback=None, arg_parser_cache=None):
+    def auto_sub_command_arg_parser(subparsers=None, command=None, apiclass=None, callback=None, arg_parser_cache=None):
 
         # if not arg_parser_cache.is_loaded():
 
@@ -148,7 +148,7 @@ class AutoManageGenerator(object):
             tmpGroup.add_argument("--override", nargs=2, action="append", type=str,
                                   help="key,val in yaml to override, such as enabled false")
 
-            #if method_name.startswith("get_"):
+            # check if "where" exists as a param in method's docstring
             x = getTypeParamFromDocStrings(getattr(apiclass, method_name), "where")
             if x:
                 tmpGroup.add_argument("--where", nargs=1, action="append", type=str,
@@ -159,5 +159,3 @@ class AutoManageGenerator(object):
         # arg_parser_cache.add_subparser(command, subparsers)
         return subparsers
 
-        # else:
-        #     return arg_parser_cache.get_subparsers(command)

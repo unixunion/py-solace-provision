@@ -29,6 +29,9 @@ from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, getClient, gener
 # populated at runtime
 active_modules = []
 
+# argparce cache holder
+apc = None
+
 
 # a generic data callback, for things like saving yaml
 def arbitrary_data_callback(*args, **kwargs):
@@ -48,13 +51,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
     subparsers = parser.add_subparsers(help='sub-command help')
 
-    # if tab-completionoing, use this
+    # if tab-completion, use this
     # the argparse cache
     try:
         import argcomplete
         apc = ArgParserCache()
-        #subparsers = apc.generate_parser(subparsers)
-        subparsers = apc.load(subparsers)
+        subparsers = apc.create_subparsers_from_cache(subparsers)
         argcomplete.autocomplete(parser)
     except Exception as e:
         logger.error("auto complete error: %s" % e)
@@ -66,11 +68,13 @@ if __name__ == '__main__':
             AutoManageGenerator
         ]
 
+        logger.info("doing")
+
         [active_modules.append(m(subparsers, client_resolver)) for m in sp_modules]
 
         # maybe generate cache for argparse
         apc = ArgParserCache()
-        apc.populate(parser)
+        apc.create_cache_from_parser(parser)
 
         args = parser.parse_args()
         from solace_semp_config.rest import ApiException
