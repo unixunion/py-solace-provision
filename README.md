@@ -15,7 +15,7 @@ Example:
         --msg_vpn_name myvpn \
         --body data/vpn.yaml \
         --override dmrEnabled false \
-        --override enavled false
+        --override enabled false
 
     pysolpro.py action get_msg_vpns --where enabled==false
 
@@ -52,10 +52,14 @@ labeled in the help as being file: Class. These must have the body argument prov
 
 ##### override
 
-When creating/updating existing objects on the appliance, you can override any of the on-disk YAML fields by appending 
-`--override key val`. For example if you want to change the enabled state of a MessageVPN.
+When creating/updating existing objects on the appliance, you can override any attributes read from the yaml files with 
+the `--override key val` parameter. For example if you want to change the enabled state(s) of a MessageVPN.
 
-    ./pysolpro.py config --update_msg_vpn --msg_vpn_name default --body default-vpn.yaml --override enabled false
+    ./pysolpro.py config update_msg_vpn \
+        --msg_vpn_name default \
+        --body default-vpn.yaml \
+        --override enabled false \
+        --override dmrEnabled false
 
 ##### where
 
@@ -76,13 +80,15 @@ keyword in the parameter specification, so the `,` separator is encoded to %2C.
 
 Example:
 
-    ./pysolpro.py config --get_msg_vpn_queues --msg_vpn_name default --where "queueName==B*"
+    ./pysolpro.py config get_msg_vpn_queues --msg_vpn_name default --where "queueName==B*"
 
 
 ### Changing the state of something
 
-You can override any key in the yaml with the --override arg.
-Case sensitive.
+Changes are sent to the appliance using the Yaml files, but with some additional arguments to identify the object to 
+update. For instance when creating an object initially, it is often enough to ship send the yaml body only, but when 
+updating, you need to name the object you are updating. Overrides can also be used to alter some yaml attributes before
+sending them to the appliance. 
 
     python pysolpro.py config update_dmr_cluster \
         --dmr_cluster_name mydmr \
