@@ -5,9 +5,38 @@ from unittest import TestCase
 
 import solace_semp_config
 
-from sp.AutoManageGenerator import AutoManageGenerator
+from sp.AutoApi import AutoApi
 from sp.legacy.common import gen_creds, http_semp_request
 from sp.util import getClient
+
+import solace_semp_action
+import solace_semp_config
+import solace_semp_monitor
+from solace_semp_action import AllApi as ActionAllApi
+from solace_semp_config import AllApi as ConfigAllApi
+from solace_semp_monitor import AllApi as MonitorAllApi
+
+# fixme, if parser already has a subcommand in mind, then we dont need to import all of these
+klasses = [
+    {
+        "api": ConfigAllApi,
+        "subcommand": "config",
+        "config_class": solace_semp_config.Configuration,
+        "client_class": solace_semp_config.ApiClient
+    },
+    {
+        "api": MonitorAllApi,
+        "subcommand": "monitor",
+        "config_class": solace_semp_monitor.Configuration,
+        "client_class": solace_semp_monitor.ApiClient
+    },
+    {
+        "api": ActionAllApi,
+        "subcommand": "action",
+        "config_class": solace_semp_action.Configuration,
+        "client_class": solace_semp_action.ApiClient
+    }
+]
 
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT)
@@ -19,7 +48,7 @@ unittest.TestLoader.sortTestMethodsUsing = None
 class TestApMsgVpn(TestCase):
     # list of "plugins" to load
     sp_modules = [
-        AutoManageGenerator
+        AutoApi
     ]
 
     # populated at runtime
@@ -33,7 +62,7 @@ class TestApMsgVpn(TestCase):
 
         self.parser = argparse.ArgumentParser(prog='pySolPro')
         subparsers = self.parser.add_subparsers(help='sub-command help')
-        [self.active_modules.append(m(subparsers, client)) for m in self.sp_modules]
+        [self.active_modules.append(m(subparsers, client, klasses=klasses)) for m in self.sp_modules]
 
     def test_a1_create_msg_vpn(self):
         args = self.parser.parse_args(['config', 'create_msg_vpn', '--body', '../data/vpn.yaml'])
