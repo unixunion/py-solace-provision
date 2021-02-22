@@ -19,6 +19,8 @@ Example:
 
     pysolpro.py action get_msg_vpns --where enabled==false
 
+    ./pysolpro.py config get_msg_vpn_queues --msg_vpn_name default 2>&1 | grep queueName
+
 ## Status
 
 Most commands work with some limitations. 
