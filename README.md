@@ -27,6 +27,11 @@ Most commands work with some limitations.
 
 1. Delete does NOT work, because python sends a "empty" body to Solace, which expects NO body whatsover. 
 2. --where only supports ONE where parameter, due to solace not accepting %2C encoded ","
+3. argparse sometimes reports the incorrect missing required positional argument, see --help for the command when this occurs
+
+    ./pysolpro.py config update_dmr_cluster --body data/dmr/dmr-cluster.yaml                   
+    ERROR type error update_dmr_cluster() missing 1 required positional argument: 'body'
+
 
 ## Setup
 
