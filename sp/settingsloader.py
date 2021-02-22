@@ -3,6 +3,8 @@ import os
 
 import yaml
 
+logger = logging.getLogger("solace-provision")
+
 primary_config = 'solace.yaml',
 
 try:
@@ -20,7 +22,7 @@ The settingsloader searches for a solace.yaml file in above locations.
 
 The environment variable: :envvar:`PYSOLPRO_CONFIG` can also be used to specify another file. e.g
 
-    PYSOLPRO_CONFIG="/tmp/my.yaml" ./bin/solace-configure.py ....
+    PYSOLPRO_CONFIG="/tmp/my.yaml" ./bin/pysolpro.py ....
 
 Examples:
 
@@ -30,7 +32,6 @@ Examples:
 
 """
 
-logging = logging.getLogger("solace-provision")
 yaml_loaded = False
 
 # defaults which are set / could not be present
@@ -47,13 +48,13 @@ for yaml_file in __yamlfiles__:
     if not os.path.exists(yaml_file):
         continue
 
-    logging.info("Using yaml file %s" % yaml_file)
+    logger.info("Using yaml file %s" % yaml_file)
     stream = open(yaml_file, 'r')
     yaml_settings = yaml.safe_load(stream)
 
     # set the defaults
     for default in defaults:
-        logging.info("Setting default %s:%s" % (default, defaults[default]))
+        logging.debug("Setting default %s:%s" % (default, defaults[default]))
         globals()[default] = defaults[default]
 
     # TODO FIXME
@@ -61,7 +62,7 @@ for yaml_file in __yamlfiles__:
 
     # get the real values if any
     for variable in yaml_settings.keys():
-        logging.info("Setting config %s:%s" % (variable, yaml_settings[variable]))
+        logging.debug("Setting config %s:%s" % (variable, yaml_settings[variable]))
         globals()[variable] = yaml_settings[variable]
 
     yaml_loaded = True

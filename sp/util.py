@@ -4,42 +4,83 @@ import re
 import textwrap
 
 import six
-import solace_semp_config
 import yaml
+
+import sp.settingsloader as settings
 
 logger = logging.getLogger('solace-provision')
 
 primitive = ("int", "str", "bool")
 
 
-def getClient(settings=None):
-    config = solace_semp_config.Configuration()
+def load_class(klassname):
+    try:
+        __import__(klassname, globals())
+    except Exception as e:
+        logging.error("Failed to import class %s" % klassname)
+        raise
 
-    config.host = settings.SOLACE_CONFIG["host"]
-    config.username = settings.SOLACE_CONFIG["username"]
-    config.password = settings.SOLACE_CONFIG["password"]
 
-    client = solace_semp_config.ApiClient(configuration=config)
+def getClient(subcommand=None, config_class=None, client_class=None):
+    """
+    Creates a client of the type for the passed parameters.
+
+    :param subcommand: the name of the subcommand is used to load the appropriate config sub-attributes under SOLACE_CONFIG
+    :param config_class: Class of the config to instantiate
+    :param client_class: Class of the client to instantiate
+    :return: the client instantiated using the client_class param
+    :rtype: object
+    """
+    config = config_class()
+
+    config.host = settings.solace_config[subcommand]["host"]
+    config.username = settings.solace_config[subcommand]["username"]
+    config.password = settings.solace_config[subcommand]["password"]
+    if "proxy" in settings.solace_config:
+        logger.info("setting proxy")
+        config.proxy = settings.solace_config["proxy"]
+
+    client = client_class(configuration=config)
+
     return client
 
 
+def genericOutputProcessor(target_method, *args, callback=None, **kwargs):
+    logger.debug("genericOutputProcessor calling target with args: %s kwargs: %s" % (args, kwargs))
+    data = target_method(*args, **kwargs)
+    logger.debug("data: %s" % data)
+    if callback:
+        callback(data, *args, **kwargs)
+    return data
+
+
 # process output, and recurs if cursor is in response
-def processOutput(target_method, args, **kwargs):
+# todo fixme this should not make assumptions about the data type
+def processOutput(target_method, args, callback=None, **kwargs):
     data = target_method(args, **kwargs)
+
+    logger.debug("data: %s" % data)
+    # logger.debug("no data, could be semp meta only")
 
     if (isinstance(data.data, list)):
         logger.debug("list response")
         for i in data.data:
             logger.info("response data\n%s" % yaml.dump(to_good_dict(i)))
+            if callback:
+                callback(yaml.dump(to_good_dict(i)))
 
     else:
         logger.debug("single response")
         logger.info("response data\n%s" % yaml.dump(to_good_dict(data.data)))
+        if callback:
+            callback(yaml.dump(to_good_dict(data.data)))
 
     cursor = getCursor(data)
     if cursor:
         logger.debug("cursor is present")
-        processOutput(target_method, args, cursor=cursor)
+        processOutput(target_method, args, cursor=cursor, callback=callback)
+
+    return data
 
 
 # simple comparator for simple types
