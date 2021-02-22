@@ -84,11 +84,11 @@ class CallProxy(object):
                             file[attrib] = value
                         logger.debug("file[%s]: %s" % (attrib, value))
                 if k == "where" and v is not None:
-                    logger.info("where v: %s" % v)
+                    logger.debug("where v: %s" % v)
                     new_where = []
                     for select in v:
                         new_where.append(select[0])
-                    logger.info("new_where: %s" % new_where)
+                    logger.debug("new_where: %s" % new_where)
                     function_kwargs["where"] = new_where
 
         if file is not None:
