@@ -107,14 +107,33 @@ sending them to the appliance.
 You can get the YAML representation of a object with almost any of the get_* subcommands, 
 though some fields should be commented out for compatibility reasons. See the data/ examples
 
-### Adding more managed types
+### Adding more manager types
 
-Add the appropriate model, and API into the "klasses" field of the AutoManageGenerator class.
+Currenctly "action", "config" and "monitor" are all present. So there is no need for this. But if you want to know.
+
+Add/Removing manager types is controlled via the "klasses" kwarg, that is passed into AutoApi upon instantiation.
+
+TODO/FIXME make this source of truth the yaml config.
 
     klasses = [
-        {"api": ConfigAllApi, "command": "config"},
-        {"api": MonitorAllApi, "command": "monitor"},
-        {"api": ActionAllApi, "command": "action"}
+        {
+            "api": ConfigAllApi,
+            "subcommand": "config",
+            "config_class": solace_semp_config.Configuration,
+            "client_class": solace_semp_config.ApiClient
+        },
+        {
+            "api": MonitorAllApi,
+            "subcommand": "monitor",
+            "config_class": solace_semp_monitor.Configuration,
+            "client_class": solace_semp_monitor.ApiClient
+        },
+        {
+            "api": ActionAllApi,
+            "subcommand": "action",
+            "config_class": solace_semp_action.Configuration,
+            "client_class": solace_semp_action.ApiClient
+        }
     ]
 
 ### Optional Extras
