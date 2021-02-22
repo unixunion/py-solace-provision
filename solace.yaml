@@ -31,6 +31,7 @@ commands:
     config_class: Configuration
     client_class: ApiClient
 
+# used for when running PySolPro server
 SERVER:
   host: 127.0.0.1
   port: 65412
