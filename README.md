@@ -145,7 +145,13 @@ see https://kislyuk.github.io/argcomplete/ for more info
     pip install argcomplete
 
 For zsh:
-
+    
+    # one time
+    autoload -U bashcompinit
+    bashcompinit
+    # add this to end of ~/.zshrc
+    # source the venv that you installed argcomplete into, should be same as PySolPro venv.
+    source ~/spvenv/bin/activate
     eval "$(register-python-argcomplete pysolpro.py)"
 
 #### Colourized logs
