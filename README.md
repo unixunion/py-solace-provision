@@ -47,6 +47,10 @@ Install PyYAML
 
     pip install pyyaml
 
+## Configure
+
+See solace.yaml for how to set up broker credentials and API endpoints.
+
 ## Running
 
 Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are 
