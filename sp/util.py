@@ -21,7 +21,7 @@ def load_class(klassname):
         raise
 
 
-def getClient(subcommand=None, config_class=None, client_class=None):
+def get_client(subcommand=None, config_class=None, client_class=None):
     """
     Creates a client of the type for the passed parameters.
 
@@ -45,7 +45,7 @@ def getClient(subcommand=None, config_class=None, client_class=None):
     return client
 
 
-def genericOutputProcessor(target_method, *args, callback=None, **kwargs):
+def generic_output_processor(target_method, *args, callback=None, **kwargs):
     logger.debug("genericOutputProcessor calling target with args: %s kwargs: %s" % (args, kwargs))
     data = target_method(*args, **kwargs)
     logger.debug("data: %s" % data)
@@ -56,7 +56,7 @@ def genericOutputProcessor(target_method, *args, callback=None, **kwargs):
 
 # process output, and recurs if cursor is in response
 # todo fixme this should not make assumptions about the data type
-def processOutput(target_method, args, callback=None, **kwargs):
+def process_output(target_method, args, callback=None, **kwargs):
     data = target_method(args, **kwargs)
 
     logger.debug("data: %s" % data)
@@ -75,10 +75,10 @@ def processOutput(target_method, args, callback=None, **kwargs):
         if callback:
             callback(yaml.dump(to_good_dict(data.data)))
 
-    cursor = getCursor(data)
+    cursor = get_cursor(data)
     if cursor:
         logger.debug("cursor is present")
-        processOutput(target_method, args, cursor=cursor, callback=callback)
+        process_output(target_method, args, cursor=cursor, callback=callback)
 
     return data
 
@@ -89,7 +89,7 @@ def is_primitive(thing):
 
 
 # for paginated requests
-def getCursor(data):
+def get_cursor(data):
     try:
         if data.meta.paging.cursor_query != "":
             return data.meta.paging.cursor_query
@@ -97,7 +97,7 @@ def getCursor(data):
         return None
 
 
-def getNextPageUri(data):
+def get_next_page_uri(data):
     try:
         if data.meta.paging.next_page_uri != "":
             return data.meta.paging.next_page_uri
@@ -175,7 +175,7 @@ class PreserveWhiteSpaceWrapRawTextHelpFormatter(argparse.RawDescriptionHelpForm
 
 
 # get the type from parameters in docstrings
-def getTypeParamFromDocStrings(method, parameterName):
+def get_type_param_from_doc_strings(method, parameterName):
     if hasattr(method, "__doc__"):
         try:
             type_name = re.search(':param (.+?) %s' % parameterName, method.__doc__)
@@ -187,4 +187,4 @@ def getTypeParamFromDocStrings(method, parameterName):
 
 
 def str2bool(v):
-    return v.lower() in ("true")
+    return v.lower() in "true"

@@ -29,7 +29,7 @@ import argparse
 
 from sp.ArgParseCache import ArgParserCache
 from sp.SolaceResponseProcessor import SolaceResponseProcessor
-from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, getClient, genericOutputProcessor
+from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, get_client, generic_output_processor
 
 # populated at runtime
 active_modules = []
@@ -51,7 +51,7 @@ def arbitrary_data_callback(*args, **kwargs):
 
 
 if __name__ == '__main__':
-    client_resolver = getClient
+    client_resolver = get_client
 
     parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
     subparsers = parser.add_subparsers(help='sub-command help')
@@ -87,8 +87,8 @@ if __name__ == '__main__':
                     aa = AutoApi(subparsers, client_resolver, klasses=klasses)
                     args = parser.parse_args()
                     try:
-                        genericOutputProcessor(args.func, args,
-                                               callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                        generic_output_processor(args.func, args,
+                                                 callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
                     except ApiException as e:
                         logger.error("error occurred %s" % e)
                     except AttributeError as e:
@@ -164,8 +164,8 @@ if __name__ == '__main__':
 
         if hasattr(args, "func"):
             try:
-                genericOutputProcessor(args.func, args,
-                                       callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                generic_output_processor(args.func, args,
+                                         callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
 
             except ApiException as e:
                 logger.error("error occurred %s" % e)

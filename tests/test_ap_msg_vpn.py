@@ -7,7 +7,7 @@ import solace_semp_config
 
 from sp.AutoApi import AutoApi
 from sp.legacy.common import gen_creds, http_semp_request
-from sp.util import getClient
+from sp.util import get_client
 
 import solace_semp_action
 import solace_semp_config
@@ -45,6 +45,7 @@ logger.setLevel(logging.INFO)
 
 unittest.TestLoader.sortTestMethodsUsing = None
 
+
 class TestApMsgVpn(TestCase):
     # list of "plugins" to load
     sp_modules = [
@@ -58,7 +59,7 @@ class TestApMsgVpn(TestCase):
     parser = None
 
     def setUp(self):
-        client = getClient
+        client = get_client
 
         self.parser = argparse.ArgumentParser(prog='pySolPro')
         subparsers = self.parser.add_subparsers(help='sub-command help')
@@ -71,7 +72,7 @@ class TestApMsgVpn(TestCase):
 
     def test_a2_override(self):
         args = self.parser.parse_args(['config', 'update_msg_vpn', '--msg_vpn_name', 'myvpn2',
-                                       '--body','../data/vpn.yaml',
+                                       '--body', '../data/vpn.yaml',
                                        '--override', 'enabled', 'false',
                                        '--override', 'dmrEnabled', 'false'])
         ret = args.func(args)
@@ -84,8 +85,8 @@ class TestApMsgVpn(TestCase):
         assert ret.meta.response_code == 200
 
     def test_z_delete_legacy(self):
-
-        client = getClient("config", client_class=solace_semp_config.ApiClient, config_class=solace_semp_config.Configuration)
+        client = get_client("config", client_class=solace_semp_config.ApiClient,
+                            config_class=solace_semp_config.Configuration)
 
         semp_request = """
         <rpc semp-version="soltr/9_0_1VMR">

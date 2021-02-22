@@ -4,7 +4,7 @@ import logging
 
 import yaml
 
-from sp.util import getTypeParamFromDocStrings, is_primitive, str2bool
+from sp.util import get_type_param_from_doc_strings, is_primitive, str2bool
 
 logger = logging.getLogger('solace-provision')
 logger.debug("imported")
@@ -57,7 +57,7 @@ class CallProxy(object):
             for k, v in a._get_kwargs():
                 if not isinstance(v, CallProxy) and k != "override" and k != "where" and v is not None:
                     logger.debug("key: %s, argument: %s" % (k, v))
-                    dt = getTypeParamFromDocStrings(method, k)
+                    dt = get_type_param_from_doc_strings(method, k)
                     if is_primitive(dt):
                         logger.debug("adding primitive: %s arg: %s" % (dt, v))
                         function_args.append(v)

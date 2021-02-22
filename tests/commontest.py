@@ -1,11 +1,11 @@
-from sp.util import getCursor
+from sp.util import get_cursor
 
 
 def makePaginatedRequest(fetchMethod, callback, **kwargs):
     ret = fetchMethod(**kwargs)
     if callable(callback):
         callback(ret)
-    cursor = getCursor(ret)
+    cursor = get_cursor(ret)
     kwargs['cursor'] = cursor
     if cursor:
         makePaginatedRequest(fetchMethod, callback, **kwargs)

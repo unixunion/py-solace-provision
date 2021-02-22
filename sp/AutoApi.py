@@ -3,7 +3,7 @@ import logging
 
 from sp.ArgParseCache import ArgParserCache
 from sp.CallProxy import CallProxy
-from sp.util import getTypeParamFromDocStrings, is_primitive
+from sp.util import get_type_param_from_doc_strings, is_primitive
 
 logger = logging.getLogger('solace-provision')
 
@@ -13,6 +13,13 @@ class AutoApi(object):
     parsers = []
 
     def __init__(self, subparsers, client_resolver, klasses=[]):
+        """
+        Generates argparser, and binds to methods it scans in the klasses list.
+
+        @param subparsers: the subparser to associate commands with, must be a subparser of parser.
+        @param client_resolver: the method used to resolve which client to use
+        @param klasses: a list of modules, classes and apis scan
+        """
         self.arg_parser_cache = ArgParserCache(do_load=False)
 
         if subparsers:
@@ -93,7 +100,7 @@ class AutoApi(object):
                 if param.name != "self" and param.name != "kwargs":
 
                     # get the type of the param from the doc strings
-                    param_type = getTypeParamFromDocStrings(getattr(apiclass, method_name), param)
+                    param_type = get_type_param_from_doc_strings(getattr(apiclass, method_name), param)
                     if is_primitive(param_type):
                         logger.debug("adding param: %s type: %s" % (param.name, param_type))
                         tmpGroup.add_argument("--%s" % param, action="store", type=str,
@@ -107,7 +114,7 @@ class AutoApi(object):
                                   help="key,val in yaml to override, such as enabled false")
 
             # check if "where" exists as a param in method's docstring
-            x = getTypeParamFromDocStrings(getattr(apiclass, method_name), "where")
+            x = get_type_param_from_doc_strings(getattr(apiclass, method_name), "where")
             if x:
                 tmpGroup.add_argument("--where", nargs=1, action="append", type=str,
                                       help="where filter to apply, e.g: msgVpnName==def*")

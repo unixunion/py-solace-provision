@@ -16,7 +16,7 @@ from solace_semp_monitor import AllApi as MonitorAllApi
 import sp.settingsloader as settings
 from sp.AutoApi import AutoApi
 from sp.nw import send_msg
-from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, processOutput, getClient
+from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, process_output, get_client
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -57,7 +57,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         self.data = self.data.decode("utf-8")
         args = parser.parse_args(self.data.split())
         try:
-            processOutput(args.func, args, callback=NetworkCallback(self.request))  # self.request.sendall
+            process_output(args.func, args, callback=NetworkCallback(self.request))  # self.request.sendall
         except ApiException as e:
             logger.error("error occurred %s" % e)
         except AttributeError as e:
@@ -90,7 +90,7 @@ klasses = [
 ]
 
 if __name__ == '__main__':
-    client_resolver = getClient
+    client_resolver = get_client
 
     parser = argparse.ArgumentParser(prog='pySolPro',
                                      formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter) # exit_on_error=False
