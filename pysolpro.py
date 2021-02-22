@@ -92,17 +92,27 @@ if __name__ == '__main__':
                     ]
 
                     from sp.AutoApi import AutoApi
+                    from solace_semp_config.rest import ApiException
 
                     aa = AutoApi(subparsers, client_resolver, klasses=klasses)
                     args = parser.parse_args()
-                    genericOutputProcessor(args.func, args,
+                    try:
+                        genericOutputProcessor(args.func, args,
                                            callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                    except ApiException as e:
+                        logger.error("error occurred %s" % e)
+                    except AttributeError as e:
+                        logger.error("attribute error %s, try adding --help" % e)
+                    except TypeError as e:
+                        logger.error("type error %s" % e)
+                    except Exception as e:
+                        parser.print_help()
+
                     sys.exit(0)
 
 
         except Exception as e:
-            logger.error("error: %s" % e)
-            raise
+            pass
 
         logger.info("initializing all modules")
 
@@ -161,7 +171,7 @@ if __name__ == '__main__':
             except ApiException as e:
                 logger.error("error occurred %s" % e)
             except AttributeError as e:
-                logger.error("attribute error %s" % e)
+                logger.error("attribute error %s, try adding --help" % e)
             except TypeError as e:
                 logger.error("type error %s" % e)
             except Exception as e:
