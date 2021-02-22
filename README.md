@@ -59,7 +59,7 @@ labeled in the help as being file: Class. These must have the body argument prov
     python pysolpro.py config create_dmr_cluster --help
     python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
     
-### Server/Client Mode
+#### Server/Client Mode
 
 Not yet complete, ignore server.py and client.py
 
