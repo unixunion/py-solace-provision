@@ -5,6 +5,8 @@ import logging
 import sys
 import importlib
 
+from sp.SubCommandConfig import create_subcmd_config
+
 try:
     import coloredlogs
 
@@ -54,7 +56,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
     subparsers = parser.add_subparsers(help='sub-command help')
 
-
     # if tab-completion, use this
     # the argparse cache
     try:
@@ -73,23 +74,12 @@ if __name__ == '__main__':
                 logger.debug("args %s" % sys.argv[1:])
                 if cmd in settings.commands:
                     logger.debug("command match, limiting subparser init")
-                    logger.debug("importing libs")
-                    module_name = settings.commands[cmd]["module"]
-                    api_class = settings.commands[cmd]["api_class"]
-                    config_class = settings.commands[cmd]["config_class"]
-                    client_class = settings.commands[cmd]["client_class"]
-                    _api_class = getattr(importlib.import_module(module_name), api_class)
-                    _config_class = getattr(importlib.import_module(module_name), config_class)
-                    _client_class = getattr(importlib.import_module(module_name), client_class)
 
-                    klasses = [
-                        {
-                            "api": _api_class,
-                            "subcommand": cmd,
-                            "config_class": _config_class,
-                            "client_class": _client_class
-                        }
-                    ]
+                    klasses = [create_subcmd_config(cmd,
+                                                    settings.commands[cmd]["module"],
+                                                    settings.commands[cmd]["api_class"],
+                                                    settings.commands[cmd]["config_class"],
+                                                    settings.commands[cmd]["client_class"])]
 
                     from sp.AutoApi import AutoApi
                     from solace_semp_config.rest import ApiException
@@ -98,7 +88,7 @@ if __name__ == '__main__':
                     args = parser.parse_args()
                     try:
                         genericOutputProcessor(args.func, args,
-                                           callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                                               callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
                     except ApiException as e:
                         logger.error("error occurred %s" % e)
                     except AttributeError as e:
@@ -112,6 +102,7 @@ if __name__ == '__main__':
 
 
         except Exception as e:
+            logger.error("Error invoking performance optimized argparse %s" % e)
             pass
 
         logger.info("initializing all modules")
@@ -119,11 +110,11 @@ if __name__ == '__main__':
         # import this here because its slow, and we don't want to impede the autocompleter
         # from sp.AutoManageGenerator import AutoManageGenerator
         from sp.AutoApi import AutoApi
+
         # list of "plugins" to load
         sp_modules = [
             AutoApi
         ]
-
 
         import solace_semp_action
         import solace_semp_config
@@ -133,29 +124,37 @@ if __name__ == '__main__':
         from solace_semp_monitor import AllApi as MonitorAllApi
 
         # fixme, if parser already has a subcommand in mind, then we dont need to import all of these
-        klasses = [
-            {
-                "api": ConfigAllApi,
-                "subcommand": "config",
-                "config_class": solace_semp_config.Configuration,
-                "client_class": solace_semp_config.ApiClient
-            },
-            {
-                "api": MonitorAllApi,
-                "subcommand": "monitor",
-                "config_class": solace_semp_monitor.Configuration,
-                "client_class": solace_semp_monitor.ApiClient
-            },
-            {
-                "api": ActionAllApi,
-                "subcommand": "action",
-                "config_class": solace_semp_action.Configuration,
-                "client_class": solace_semp_action.ApiClient
-            }
-        ]
+
+        klasses = []
+        for cmd in settings.commands:
+            klasses.append(create_subcmd_config(cmd,
+                                                settings.commands[cmd]["module"],
+                                                settings.commands[cmd]["api_class"],
+                                                settings.commands[cmd]["config_class"],
+                                                settings.commands[cmd]["client_class"]))
+
+        # klasses = [
+        #     {
+        #         "api": ConfigAllApi,
+        #         "subcommand": "config",
+        #         "config_class": solace_semp_config.Configuration,
+        #         "client_class": solace_semp_config.ApiClient
+        #     },
+        #     {
+        #         "api": MonitorAllApi,
+        #         "subcommand": "monitor",
+        #         "config_class": solace_semp_monitor.Configuration,
+        #         "client_class": solace_semp_monitor.ApiClient
+        #     },
+        #     {
+        #         "api": ActionAllApi,
+        #         "subcommand": "action",
+        #         "config_class": solace_semp_action.Configuration,
+        #         "client_class": solace_semp_action.ApiClient
+        #     }
+        # ]
 
         [active_modules.append(m(subparsers, client_resolver, klasses=klasses)) for m in sp_modules]
-
         # maybe generate cache for argparse
         apc = ArgParserCache()
         apc.create_cache_from_parser(parser)

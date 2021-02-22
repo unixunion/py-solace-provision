@@ -46,7 +46,7 @@ class ArgParserCache:
         data = {}
 
         try:
-            logger.info("populating cache from parser: %s" % parser)
+            logger.info("populating cache from parser")
             t = parser._actions[1].choices
             for subcommand in t:
                 data[subcommand] = {}
