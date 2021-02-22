@@ -6,6 +6,12 @@ import socketserver
 import sys
 
 from solace_semp_config.rest import ApiException
+import solace_semp_action
+import solace_semp_config
+import solace_semp_monitor
+from solace_semp_action import AllApi as ActionAllApi
+from solace_semp_config import AllApi as ConfigAllApi
+from solace_semp_monitor import AllApi as MonitorAllApi
 
 import sp.settingsloader as settings
 from sp.AutoApi import AutoApi
