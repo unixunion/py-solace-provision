@@ -51,6 +51,12 @@ def generic_output_processor(target_method, *args, callback=None, **kwargs):
     logger.debug("data: %s" % data)
     if callback:
         callback(data, *args, **kwargs)
+
+    cursor = get_cursor(data)
+    if cursor:
+        logger.debug("cursor is present")
+        generic_output_processor(target_method, *args, cursor=cursor, callback=callback, **kwargs)
+
     return data
 
 
