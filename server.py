@@ -8,7 +8,7 @@ import sys
 from solace_semp_config.rest import ApiException
 
 import sp.settingsloader as settings
-from sp.AutoManageGenerator import AutoManageGenerator
+from sp.AutoApi import AutoApi
 from sp.nw import send_msg
 from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, processOutput, getClient
 
@@ -22,7 +22,7 @@ logger.addHandler(handler)
 
 # list of "plugins" to load
 sp_modules = [
-    AutoManageGenerator
+    AutoApi
 ]
 
 # populated at runtime
@@ -61,6 +61,27 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         except Exception as e:
             logger.error("exception: %s" % e)
 
+            
+klasses = [
+    {
+        "api": ConfigAllApi,
+        "subcommand": "config",
+        "config_class": solace_semp_config.Configuration,
+        "client_class": solace_semp_config.ApiClient
+    },
+    {
+        "api": MonitorAllApi,
+        "subcommand": "monitor",
+        "config_class": solace_semp_monitor.Configuration,
+        "client_class": solace_semp_monitor.ApiClient
+    },
+    {
+        "api": ActionAllApi,
+        "subcommand": "action",
+        "config_class": solace_semp_action.Configuration,
+        "client_class": solace_semp_action.ApiClient
+    }
+]
 
 if __name__ == '__main__':
     client_resolver = getClient
@@ -71,7 +92,7 @@ if __name__ == '__main__':
         pass
     parser.__setattr__("exit", x)
     subparsers = parser.add_subparsers(help='sub-command help')
-    [active_modules.append(m(subparsers, client_resolver)) for m in sp_modules]
+    [active_modules.append(m(subparsers, client_resolver, klasses=klasses)) for m in sp_modules]
 
     with socketserver.TCPServer((settings.SERVER["host"], settings.SERVER["port"]), MyTCPHandler) as server:
         server.serve_forever()
