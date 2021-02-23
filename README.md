@@ -115,6 +115,21 @@ same time.
       setPercent: 60
     #  setValue: 0
 
+You also cannot mix authentication mechanisms, like password and certificate. Choose one. 
+
+    replicationBridgeAuthenticationBasicClientUsername: ""
+    replicationBridgeAuthenticationBasicPassword: ""
+    # replicationBridgeAuthenticationClientCertContent: ""
+    # replicationBridgeAuthenticationClientCertPassword: ""
+
+The response from the appliance will generally indicate if you have incompatible configurations.
+
+        "error":{
+            "code":89,
+            "description":"Problem with replicationBridgeAuthenticationClientCertContent or replicationBridgeAuthenticationClientCertPassword: Channel not encrypted",
+            "status":"NOT_ALLOWED"
+        },
+
 When using Object Files to create/update managed objects on the broker, you can use the `--override` argument to override 
 any attribute in the YAML files. As an example, this can be used enable/disable services. It can also be used to 
 "template" objects. e.g:

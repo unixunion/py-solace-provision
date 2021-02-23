@@ -96,6 +96,7 @@ if __name__ == '__main__':
                     except TypeError as e:
                         logger.error("type error %s" % e)
                     except Exception as e:
+                        logger.error("Exception: %s" % e)
                         parser.print_help()
 
                     sys.exit(0)
