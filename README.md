@@ -19,17 +19,18 @@ Example:
 
     pysolpro.py action get_msg_vpns --where enabled==false
 
-    ./pysolpro.py config get_msg_vpn_queues --msg_vpn_name default 2>&1 | grep queueName
+    pysolpro.py config get_msg_vpn_queues --msg_vpn_name default 2>&1 | grep queueName
 
 ## Status
 
 Most commands work with some limitations. 
 
-1. Delete does NOT work, because python sends a "empty" body to Solace, but OpenApi encodes the empty body as a empty
-   json object: `{}`. SEMPv2 expects NO body whatsover. 
-2. `--where` only supports ONE where parameter, due to solace OpenAPI spec being v2, and the API not accepting %2C encoded comma.
-   OpenAPIv3 offers a `allowReserved` setting to prevent encoding of reserved characters.
-3. Argparse sometimes reports the incorrect missing required positional argument, see --help for the command when this occurs
+1. Delete does NOT work, because modern OpenAPI generated interfaces sends a body, and even though the body is empty, 
+   it is encoded to a empty json object `{}`, which Solace rejects as it expects NO body at all.
+2. `--where` only supports ONE where parameter, due to solace OpenAPI spec being v2, and the API not accepting %2C encoded 
+   comma. If Solace moves to OpenAPIv3, there is a `allowReserved` setting to prevent encoding of reserved characters.
+3. Argparse sometimes reports the incorrect missing required positional argument, see --help for the command when this 
+   occurs.
 
     ./pysolpro.py config update_dmr_cluster --body data/dmr/dmr-cluster.yaml                   
     ERROR type error update_dmr_cluster() missing 1 required positional argument: 'body'
