@@ -26,7 +26,7 @@ The environment variable: :envvar:`PYSOLPRO_CONFIG` can also be used to specify 
 
 Examples:
 
-    >>> import sp.settingsloader as settings
+    >>> import sp.SettingsLoader as settings
     >>> settings.CMDB_URL
     'http://mydomain.com/path'
 

@@ -57,7 +57,7 @@ Now clone https://github.com/unixunion/py-solace-provision.git
 ## Configure
 
 See solace.yaml for how to set up broker credentials and API endpoints. Config is loaded from locations mentioned in 
-[sp/settingsloader.py](sp/settingsloader.py). You can override the location of the config with with the environment 
+[sp/SettingsLoader.py](sp/SettingsLoader.py). You can override the location of the config with with the environment 
 variable:
 
     PYSOLPRO_CONFIG=data/broker1.yaml

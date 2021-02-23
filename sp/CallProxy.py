@@ -33,13 +33,7 @@ class CallProxy(object):
             return self.target.__call__(*new_args, where=where)
         else:
             return self.target.__call__(*new_args)
-        #
-        # if "cursor" in kwargs:
-        #     logger.debug("cursor: %s" % kwargs.get("cursor"))
-        #     return self.target.__call__(*new_args, cursor=kwargs.get("cursor"))
-        # else:
-        #     logger.debug("no cursor call")
-        #     return self.target.__call__(*new_args)
+
 
     def getInstance(self):
         return self.api_instance

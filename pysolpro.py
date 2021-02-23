@@ -3,7 +3,6 @@
 
 import logging
 import sys
-import importlib
 
 from sp.SubCommandConfig import create_subcmd_config
 
@@ -24,7 +23,7 @@ logger = logging.getLogger("solace-provision")
 # handler.setFormatter(formatter)
 # logger.addHandler(handler)
 
-import sp.settingsloader as settings
+import sp.SettingsLoader as settings
 import argparse
 
 from sp.ArgParseCache import ArgParserCache
@@ -34,7 +33,7 @@ from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, get_client, gene
 # populated at runtime
 active_modules = []
 
-# argparce cache holder
+# argparse cache holder
 apc = None
 
 

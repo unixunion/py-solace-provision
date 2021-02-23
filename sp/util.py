@@ -6,7 +6,7 @@ import textwrap
 import six
 import yaml
 
-import sp.settingsloader as settings
+import sp.SettingsLoader as settings
 
 logger = logging.getLogger('solace-provision')
 

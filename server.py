@@ -13,7 +13,7 @@ from solace_semp_action import AllApi as ActionAllApi
 from solace_semp_config import AllApi as ConfigAllApi
 from solace_semp_monitor import AllApi as MonitorAllApi
 
-import sp.settingsloader as settings
+import sp.SettingsLoader as settings
 from sp.AutoApi import AutoApi
 from sp.nw import send_msg
 from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, process_output, get_client
