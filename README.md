@@ -1,7 +1,7 @@
-# pySolPro
-A automated self-generating command-line tool for Solace appliances.
-This tool scans the imported solace_semp_api and renders the Api into a command-line tool with some basic ability to 
-create, update and delete Solace managed objects.
+# py-solace-provision
+
+An automated self-generating command-line tool for Solace appliances. This tool scans the imported `solace_semp_api` and 
+renders the Api into a command-line tool with some basic ability to create, update and delete Solace managed objects.
 
 Example:
 
@@ -25,15 +25,17 @@ Example:
 
 Most commands work with some limitations. 
 
-1. Delete does NOT work, because python sends a "empty" body to Solace, which expects NO body whatsover. 
-2. --where only supports ONE where parameter, due to solace not accepting %2C encoded ","
-3. argparse sometimes reports the incorrect missing required positional argument, see --help for the command when this occurs
+1. Delete does NOT work, because python sends a "empty" body to Solace, but OpenApi encodes the empty body as a empty
+   json object: `{}`. SEMPv2 expects NO body whatsover. 
+2. `--where` only supports ONE where parameter, due to solace OpenAPI spec being v2, and the API not accepting %2C encoded comma.
+   OpenAPIv3 offers a `allowReserved` setting to prevent encoding of reserved characters.
+3. Argparse sometimes reports the incorrect missing required positional argument, see --help for the command when this occurs
 
     ./pysolpro.py config update_dmr_cluster --body data/dmr/dmr-cluster.yaml                   
     ERROR type error update_dmr_cluster() missing 1 required positional argument: 'body'
 
 
-## Setup
+## Installation
 
 Create a virtual environment for this
 
@@ -45,32 +47,66 @@ Generate the python-config API for the version of the appliance you need using h
     git clone https://github.com/unixunion/solace_semp_client.git
     cd solace_semp_client
     ./build.sh python 9.8.0.12
-    # for each dir of python_config, python_monitor, python_action
-    cd output/${dir}
-    # be sure you activated the venv above! 
-    python setup.py install
-
-Install PyYAML
-
+    cd output
+    for module in *; do cd $module; python setup.py install; cd ..; done
     pip install pyyaml
+
+Now clone https://github.com/unixunion/py-solace-provision.git
 
 ## Configure
 
 See solace.yaml for how to set up broker credentials and API endpoints. Config is loaded from locations mentioned in 
-sp/settingsloader.py You can override the config with the environment variable:
+[sp/settingsloader.py](sp/settingsloader.py). You can override the location of the config with with the environment 
+variable:
 
     PYSOLPRO_CONFIG=data/broker1.yaml
 
-API's are also configured in the yaml config, see `commands` key.
+The config file also denotes which API's to generate commands for. There are 3 options, `config`, `action` and `monitor`.
+Configuring the API's example:
+
+    commands:
+      config:
+        module: solace_semp_config
+        api_class: AllApi
+        config_class: Configuration
+        client_class: ApiClient
+      monitor:
+        module: solace_semp_monitor
+        api_class: AllApi
+        config_class: Configuration
+        client_class: ApiClient
+      action:
+        module: solace_semp_action
+        api_class: AllApi
+        config_class: Configuration
+        client_class: ApiClient
+
+Solace broker configs are grouped per API configured above.
+
+    solace_config:
+      config:
+        host: http://localhost:8080/SEMP/v2/config
+        username: admin
+        password: admin
+      monitor:
+        host: http://localhost:8080/SEMP/v2/monitor
+        username: admin
+        password: admin
+      action:
+        host: http://localhost:8080/SEMP/v2/action
+        username: admin
+        password: admin
+
 
 ## Object Files
 
-All solace managed objects can be represented as YAML files. see data/ for some examples. These can be created by querying
-the appliance for the relevant object. Note that some attributes are NOT retrieved from appliances during GET operations. 
-Examples are items such as credentials.
+All solace managed objects can be represented as YAML files. see [data/](data/) for some examples. These can be created 
+by querying the appliance for the relevant object. Note that some attributes are NOT retrieved from appliances during 
+GET operations. Some examples are items such as credentials.
 
 Solace has a tendency to have incompatible attributes, and these should be removed from YAML before submitting to appliance. 
-Examples of these are commented out in data/ files. For example you cannot use clearPercent and clearValue at same time.
+Examples of these are commented out in [data/](/data) files. For example you cannot use clearPercent and clearValue at 
+same time.
 
     eventEgressFlowCountThreshold:
       clearPercent: 40
@@ -78,8 +114,9 @@ Examples of these are commented out in data/ files. For example you cannot use c
       setPercent: 60
     #  setValue: 0
 
-When using Object files to create/update managed objects on the broker, you can use the --override argument to override any
-key in the YAML files. This is used to enable/disable services as an example. It can also be used to "template" objects. e.g:
+When using Object Files to create/update managed objects on the broker, you can use the `--override` argument to override 
+any attribute in the YAML files. As an example, this can be used enable/disable services. It can also be used to 
+"template" objects. e.g:
 
     pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName myVpn
     pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName anotherVpnSameYaml
@@ -87,18 +124,26 @@ key in the YAML files. This is used to enable/disable services as an example. It
 ## Running
 
 Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are 
-labeled in the help as being file: Class. These must have the body argument provide a path to a YAML file.
+labeled in the help as being `file: ClassName`. These must have their argument provide a path to a YAML file.
 
     python pysolpro.py config create_dmr_cluster --help
-    python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
+    usage: pySolPro config create_msg_vpn [-h] [--body BODY] [--override OVERRIDE OVERRIDE]
     
+    optional arguments:
+      -h, --help            show this help message and exit
+      --body BODY           file: MsgVpn
+      --override OVERRIDE OVERRIDE
+                            key,val in yaml to override, such as enabled false
+
+    python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
+
 
 #### Special parameters
 
-##### override
+##### --override
 
-When creating/updating existing objects on the appliance, you can override any attributes read from the yaml files with 
-the `--override key val` parameter. For example if you want to change the enabled state(s) of a MessageVPN.
+When creating/updating objects on the appliance, you can override any attributes read from the yaml files with the 
+`--override KEY VALUE` argument. For example if you want to change the enabled state(s) of a MessageVPN.
 
     ./pysolpro.py config update_msg_vpn \
         --msg_vpn_name default \
@@ -106,7 +151,9 @@ the `--override key val` parameter. For example if you want to change the enable
         --override enabled false \
         --override dmrEnabled false
 
-##### where
+Multiple `--override` argyments can be provided.
+
+##### --where
 
 Include in the response only objects where certain conditions are true. Use this query parameter to limit which objects 
 are returned to those whose attribute values meet the given conditions.
@@ -126,6 +173,8 @@ keyword in the parameter specification, so the `,` separator is encoded to %2C.
 Example:
 
     ./pysolpro.py config get_msg_vpn_queues --msg_vpn_name default --where "queueName==B*"
+    ./pysolpro.py config get_msg_vpn_queues --msg_vpn_name default --where "enabled==false"
+    ./pysolpro.py monitor get_msg_vpn_queues --msg_vpn_name default --where "spooledByteCount>1000000"
 
 
 #### Changing the state of something
