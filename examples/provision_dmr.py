@@ -20,15 +20,11 @@ broker1_config = "data/broker1.yaml"
 broker2_config = "data/broker2.yaml"
 
 
-# Get the ip addresses of the brokers
-proc = subprocess.Popen(['docker', 'inspect', 'broker1'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-b1 = proc.communicate()[0].decode("UTF-8")
-proc = subprocess.Popen(['docker', 'inspect', 'broker2'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-b2 = proc.communicate()[0].decode("UTF-8")
-b1_inspect_data = json.loads(b1)
-b1_ipaddress = b1_inspect_data[0]['NetworkSettings']['Networks']['solace-provision_default']['IPAddress']
-b2_inspect_data = json.loads(b2)
-b2_ipaddress = b2_inspect_data[0]['NetworkSettings']['Networks']['solace-provision_default']['IPAddress']
+t1 = subprocess.Popen(['docker', 'inspect', '-f', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'broker1'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+b1_ipaddress = t1.communicate()[0].decode("UTF-8").strip()
+t2 = subprocess.Popen(['docker', 'inspect', '-f', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'broker2'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+b2_ipaddress = t2.communicate()[0].decode("UTF-8").strip()
+
 logging.info("broker1: %s" % b1_ipaddress)
 logging.info("broker2: %s" % b2_ipaddress)
 
