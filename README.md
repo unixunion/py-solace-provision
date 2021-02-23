@@ -164,6 +164,10 @@ For zsh:
     source ~/spvenv/bin/activate
     eval "$(register-python-argcomplete pysolpro.py)"
 
+To populate the cache, run the --help command:
+
+    ./pysolpro.py --help
+
 #### Colourized logs
 
     pip install coloredlogs
