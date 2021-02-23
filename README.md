@@ -56,10 +56,33 @@ Install PyYAML
 
 ## Configure
 
-See solace.yaml for how to set up broker credentials and API endpoints. You can override where the config is read from
-with environment variable:
+See solace.yaml for how to set up broker credentials and API endpoints. Config is loaded from locations mentioned in 
+sp/settingsloader.py You can override the config with the environment variable:
 
     PYSOLPRO_CONFIG=data/broker1.yaml
+
+API's are also configured in the yaml config, see `commands` key.
+
+## Object Files
+
+All solace managed objects can be represented as YAML files. see data/ for some examples. These can be created by querying
+the appliance for the relevant object. Note that some attributes are NOT retrieved from appliances during GET operations. 
+Examples are items such as credentials.
+
+Solace has a tendency to have incompatible attributes, and these should be removed from YAML before submitting to appliance. 
+Examples of these are commented out in data/ files. For example you cannot use clearPercent and clearValue at same time.
+
+    eventEgressFlowCountThreshold:
+      clearPercent: 40
+    #  clearValue: 0
+      setPercent: 60
+    #  setValue: 0
+
+When using Object files to create/update managed objects on the broker, you can use the --override argument to override any
+key in the YAML files. This is used to enable/disable services as an example. It can also be used to "template" objects. e.g:
+
+    pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName myVpn
+    pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName anotherVpnSameYaml
 
 ## Running
 
@@ -69,9 +92,6 @@ labeled in the help as being file: Class. These must have the body argument prov
     python pysolpro.py config create_dmr_cluster --help
     python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
     
-#### Server/Client Mode
-
-Not yet complete, ignore server.py and client.py
 
 #### Special parameters
 
@@ -108,7 +128,7 @@ Example:
     ./pysolpro.py config get_msg_vpn_queues --msg_vpn_name default --where "queueName==B*"
 
 
-### Changing the state of something
+#### Changing the state of something
 
 Changes are sent to the appliance using the Yaml files, but with some additional arguments to identify the object to 
 update. For instance when creating an object initially, it is often enough to ship send the yaml body only, but when 
@@ -125,34 +145,6 @@ sending them to the appliance.
 You can get the YAML representation of a object with almost any of the get_* subcommands, 
 though some fields should be commented out for compatibility reasons. See the data/ examples
 
-### Adding more manager types
-
-Currenctly "action", "config" and "monitor" are all present. So there is no need for this. But if you want to know.
-
-Add/Removing manager types is controlled via the "klasses" kwarg, that is passed into AutoApi upon instantiation.
-
-TODO/FIXME make this source of truth the yaml config.
-
-    klasses = [
-        {
-            "api": ConfigAllApi,
-            "subcommand": "config",
-            "config_class": solace_semp_config.Configuration,
-            "client_class": solace_semp_config.ApiClient
-        },
-        {
-            "api": MonitorAllApi,
-            "subcommand": "monitor",
-            "config_class": solace_semp_monitor.Configuration,
-            "client_class": solace_semp_monitor.ApiClient
-        },
-        {
-            "api": ActionAllApi,
-            "subcommand": "action",
-            "config_class": solace_semp_action.Configuration,
-            "client_class": solace_semp_action.ApiClient
-        }
-    ]
 
 ### Optional Extras
 #### Tab completion
