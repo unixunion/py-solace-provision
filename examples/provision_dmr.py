@@ -5,6 +5,11 @@ import subprocess
 import logging
 import sys
 
+"""
+This python script configures DMR betwixt two local solace brokers.
+
+"""
+
 logging.basicConfig(level=logging.INFO)
 
 if not os.path.isfile("pysolpro.py"):
