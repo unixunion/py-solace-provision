@@ -56,7 +56,10 @@ Install PyYAML
 
 ## Configure
 
-See solace.yaml for how to set up broker credentials and API endpoints.
+See solace.yaml for how to set up broker credentials and API endpoints. You can override where the config is read from
+with environment variable:
+
+    PYSOLPRO_CONFIG=data/broker1.yaml
 
 ## Running
 

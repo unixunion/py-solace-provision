@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   solace:
-    container_name: solace_sp
+    container_name: broker1
     image: solace/solace-pubsub-standard:9.8.0.12
     #image: solace/solace-pubsub-standard:9.0.1.7
     shm_size: 4g
@@ -20,3 +20,24 @@ services:
       - username_admin_globalaccesslevel=admin
       - username_admin_password=admin
       - system_scaling_maxconnectioncount=1000
+      - routername=broker1
+  solace2:
+    container_name: broker2
+    image: solace/solace-pubsub-standard:9.8.0.12
+    #image: solace/solace-pubsub-standard:9.0.1.7
+    shm_size: 4g
+    ulimits:
+      core: 1
+      nofile:
+        soft: 418332
+        hard: 418332
+    ports:
+      #SEMP / PubSub+ Manager
+      - '8081:8080'
+      #SMF
+      - '55558:55555'
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=1000
+      - routername=broker2

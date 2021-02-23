@@ -116,12 +116,12 @@ if __name__ == '__main__':
             AutoApi
         ]
 
-        import solace_semp_action
-        import solace_semp_config
-        import solace_semp_monitor
-        from solace_semp_action import AllApi as ActionAllApi
-        from solace_semp_config import AllApi as ConfigAllApi
-        from solace_semp_monitor import AllApi as MonitorAllApi
+        # import solace_semp_action
+        # import solace_semp_config
+        # import solace_semp_monitor
+        # from solace_semp_action import AllApi as ActionAllApi
+        # from solace_semp_config import AllApi as ConfigAllApi
+        # from solace_semp_monitor import AllApi as MonitorAllApi
 
         # fixme, if parser already has a subcommand in mind, then we dont need to import all of these
 

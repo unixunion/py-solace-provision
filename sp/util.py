@@ -37,7 +37,6 @@ def get_client(subcommand=None, config_class=None, client_class=None):
     config.username = settings.solace_config[subcommand]["username"]
     config.password = settings.solace_config[subcommand]["password"]
     if "proxy" in settings.solace_config:
-        logger.info("setting proxy")
         config.proxy = settings.solace_config["proxy"]
 
     client = client_class(configuration=config)

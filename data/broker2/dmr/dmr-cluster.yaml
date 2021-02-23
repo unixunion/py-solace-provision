@@ -6,7 +6,7 @@ authenticationBasicPassword: password
 directOnlyEnabled: false
 dmrClusterName: mydmr
 enabled: false
-# nodeName: solace-bru
+nodeName: broker2
 tlsServerCertEnforceTrustedCommonNameEnabled: true
 tlsServerCertMaxChainDepth: 3
 tlsServerCertValidateDateEnabled: true

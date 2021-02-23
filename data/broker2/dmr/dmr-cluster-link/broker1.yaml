@@ -19,7 +19,7 @@ clientProfileTcpMaxSegmentSize: 1460
 clientProfileTcpMaxWindowSize: 256
 dmrClusterName: mydmr
 egressFlowWindowSize: 255
-enabled: true
+enabled: false
 initiator: lexical
 queueDeadMsgQueue: "#DEAD_MSG_QUEUE"
 queueEventSpoolUsageThreshold:
@@ -31,7 +31,7 @@ queueMaxRedeliveryCount: 0
 queueMaxTtl: 0
 queueRejectMsgToSenderOnDiscardBehavior: always
 queueRespectTtlEnabled: false
-remoteNodeName: solace-stk
+remoteNodeName: broker1
 span: internal
 transportCompressedEnabled: false
 transportTlsEnabled: false
