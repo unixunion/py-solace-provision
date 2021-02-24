@@ -25,11 +25,9 @@ Example:
 
 Most commands work with some limitations. 
 
-1. Delete does NOT work, because modern OpenAPI generated interfaces sends a body, and even though the body is empty, 
-   it is encoded to a empty json object `{}`, which Solace rejects as it expects NO body at all.
-2. `--where` only supports ONE where parameter, due to solace OpenAPI spec being v2, and the API not accepting %2C encoded 
+1. `--where` only supports ONE where parameter, due to solace OpenAPI spec being v2, and the API not accepting %2C encoded 
    comma. If Solace moves to OpenAPIv3, there is a `allowReserved` setting to prevent encoding of reserved characters.
-3. Argparse sometimes reports the incorrect missing required positional argument, see --help for the command when this 
+2. Argparse sometimes reports the incorrect missing required positional argument, see --help for the command when this 
    occurs.
 
     ./pysolpro.py config update_dmr_cluster --body data/dmr/dmr-cluster.yaml                   
