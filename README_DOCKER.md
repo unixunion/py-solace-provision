@@ -1,6 +1,11 @@
 # pysolpro
 
-python-solace-provision, or pysolpro for short, is a commandline tool which is generated from Solace SEMPv2 APIs. It provides CRUD operations for solace managed objects using YAML files as the underlying data layer.
+python-solace-provision, or pysolpro for short, is a commandline tool which is generated from Solace SEMPv2 APIs. 
+It provides CRUD operations for solace managed objects using YAML files as the underlying data layer.
+
+For source, see https://github.com/unixunion/py-solace-provision
+
+Different versions are provided to different appliance SEMP versions. Choose appropriately.
 
 ## Config File
 
@@ -40,7 +45,8 @@ API's exposed.
         config_class: Configuration
         client_class: ApiClient
     
-Note, older versions of solace don't have the AllApi, so if you get an error about AllApi not found in module, you should use MsgVpnApi e.g:
+Note, older versions of Solace don't have the `AllApi`, so if you get an error about AllApi not found in module, you 
+should use `MsgVpnApi` instead. e.g:
 
     commands:
       config:
@@ -64,18 +70,36 @@ Note, older versions of solace don't have the AllApi, so if you get an error abo
 The yaml config needs to be mounted at a specific location inside the container.
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:alpha-1 config --help
+        unixunion/pysolpro:alpha-9.8.0.12 config --help
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:alpha-1 config create_msg_vpn --help
+        unixunion/pysolpro:alpha-9.8.0.12 config create_msg_vpn --help
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:alpha-1 \
+        unixunion/pysolpro:alpha-9.8.0.12 \
         config get_msg_vpns
 
-You will need to mount any solace managed object yaml too.
+
+## Yaml Data Files
+
+Every solace managed object can be provisioned and updated from YAML data. The yaml data should be mounted into the 
+container. e.g:
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:alpha-1 \
+        -v `pwd`/data:/data  unixunion/pysolpro:alpha-9.8.0.12 \
         config create_msg_vpn --body /data/vpn.yaml
+
+### Yaml Examples
+
+In order to create YAML [data](https://github.com/unixunion/py-solace-provision/tree/master/data) files, simply query the appliance for the data. Note that some properties cannot be queried, 
+such as credentials, and certificates.
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        -v `pwd`/data:/data  unixunion/pysolpro:alpha-9.8.0.12 \
+        config get_msg_vpn --msg_vpn_name default
+
+The output from the above can be saved to file, and used as body payload for CRUD operations. 
+
+See https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn/createMsgVpn for
+more information about what fields should be present.
 
