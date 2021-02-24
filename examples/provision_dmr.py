@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-import json
+import logging
 import os
 import subprocess
-import logging
 import sys
 
 """
@@ -20,9 +19,11 @@ broker1_config = "data/broker1.yaml"
 broker2_config = "data/broker2.yaml"
 
 
-t1 = subprocess.Popen(['docker', 'inspect', '-f', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'broker1'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+t1 = subprocess.Popen(['docker', 'inspect', '-f', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'broker1']
+                      , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 b1_ipaddress = t1.communicate()[0].decode("UTF-8").strip()
-t2 = subprocess.Popen(['docker', 'inspect', '-f', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'broker2'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+t2 = subprocess.Popen(['docker', 'inspect', '-f', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'broker2']
+                      , stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 b2_ipaddress = t2.communicate()[0].decode("UTF-8").strip()
 
 logging.info("broker1: %s" % b1_ipaddress)

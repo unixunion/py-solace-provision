@@ -44,8 +44,7 @@ def arbitrary_data_callback(*args, **kwargs):
     logger.debug("kwargs: %s" % kwargs)
 
     if args[0]:
-        # do something with the data
-        # data = args[0]
+        logger.debug("data process: %s" % args[0])
         pass
 
 
@@ -64,7 +63,7 @@ if __name__ == '__main__':
         subparsers = apc.create_subparsers_from_cache(subparsers)
         argcomplete.autocomplete(parser)
     except Exception as e:
-        logger.error("auto complete error: %s" % e)
+        logger.warning("auto complete not installed, tab completion disabled")
     finally:
 
         try:
@@ -126,8 +125,8 @@ if __name__ == '__main__':
 
         [active_modules.append(m(subparsers, client_resolver, klasses=klasses)) for m in sp_modules]
         # maybe generate cache for argparse
-        apc = ArgParserCache()
-        apc.create_cache_from_parser(parser)
+        if apc:
+            apc.create_cache_from_parser(parser)
 
         args = parser.parse_args()
         from solace_semp_config.rest import ApiException
