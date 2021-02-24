@@ -80,21 +80,21 @@ class TestApMsgVpn(TestCase):
         assert ret.meta.response_code == 200
 
     def test_delete(self):
-        args = self.parser.parse_args(['config', 'delete_msg_vpn', '--msg_vpn_name', 'default'])
+        args = self.parser.parse_args(['config', 'delete_msg_vpn', '--msg_vpn_name', 'myvpn2'])
         ret = args.func(args)
         assert ret.meta.response_code == 200
 
-    def test_z_delete_legacy(self):
-        client = get_client("config", client_class=solace_semp_config.ApiClient,
-                            config_class=solace_semp_config.Configuration)
-
-        semp_request = """
-        <rpc semp-version="soltr/9_0_1VMR">
-            <no>
-                <message-vpn>
-                    <vpn-name>%s</vpn-name>
-                </message-vpn>
-            </no>
-        </rpc>""" % "myvpn2"
-        cred, headers = gen_creds(client.configuration.username, client.configuration.password)
-        return http_semp_request(client.configuration.host.split("/SEMP")[0], headers, semp_request, None)
+    # def test_z_delete_legacy(self):
+    #     client = get_client("config", client_class=solace_semp_config.ApiClient,
+    #                         config_class=solace_semp_config.Configuration)
+    #
+    #     semp_request = """
+    #     <rpc semp-version="soltr/9_0_1VMR">
+    #         <no>
+    #             <message-vpn>
+    #                 <vpn-name>%s</vpn-name>
+    #             </message-vpn>
+    #         </no>
+    #     </rpc>""" % "myvpn2"
+    #     cred, headers = gen_creds(client.configuration.username, client.configuration.password)
+    #     return http_semp_request(client.configuration.host.split("/SEMP")[0], headers, semp_request, None)

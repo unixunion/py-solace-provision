@@ -137,7 +137,7 @@ Lets change the queue enabled state
             --msg_vpn_name default \
             --queue_name test \
             --body /data/queue.yaml \
-            --override enabled false
+            --override egressEnabled false
 
 
 ### Common Pitfals
