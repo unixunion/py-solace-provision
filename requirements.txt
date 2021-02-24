@@ -1,0 +1,8 @@
+argcomplete==1.12.2
+certifi==2020.12.5
+coloredlogs==15.0
+humanfriendly==9.1
+python-dateutil==2.8.1
+PyYAML==5.4.1
+six==1.15.0
+urllib3==1.26.3
