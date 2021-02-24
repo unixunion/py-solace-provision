@@ -33,6 +33,9 @@ Most commands work with some limitations.
     ./pysolpro.py config update_dmr_cluster --body data/dmr/dmr-cluster.yaml                   
     ERROR type error update_dmr_cluster() missing 1 required positional argument: 'body'
 
+## Docker
+
+Docker images available at https://hub.docker.com/r/unixunion/pysolpro
 
 ## Installation
 
@@ -84,6 +87,8 @@ Configuring the API's example:
         api_class: AllApi
         config_class: Configuration
         client_class: ApiClient
+
+Older versions of SEMP api don't have the AllApi interface, in those cases use MsgVpnApi instead.
 
 Solace broker configs are grouped per API configured above.
 

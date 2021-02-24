@@ -1,0 +1,81 @@
+# pysolpro
+
+python-solace-provision, or pysolpro for short, is a commandline tool which is generated from Solace SEMPv2 APIs. It provides CRUD operations for solace managed objects using YAML files as the underlying data layer.
+
+## Config File
+
+The config file is rather straight forward. Here is an example for a local solace broker with all three
+API's exposed.
+
+    ---
+    solace_config:
+      config:
+        host: http://172.17.0.1:8080/SEMP/v2/config
+        username: admin
+        password: admin
+      monitor:
+        host: http://172.17.0.1:8080/SEMP/v2/monitor
+        username: admin
+        password: admin
+      action:
+        host: http://172.17.0.1:8080/SEMP/v2/action
+        username: admin
+        password: admin
+      #proxy: http://localhost:5555
+    
+    commands:
+      config:
+        module: solace_semp_config
+        api_class: AllApi
+        config_class: Configuration
+        client_class: ApiClient
+      monitor:
+        module: solace_semp_monitor
+        api_class: AllApi
+        config_class: Configuration
+        client_class: ApiClient
+      action:
+        module: solace_semp_action
+        api_class: AllApi
+        config_class: Configuration
+        client_class: ApiClient
+    
+Note, older versions of solace don't have the AllApi, so if you get an error about AllApi not found in module, you should use MsgVpnApi e.g:
+
+    commands:
+      config:
+        module: solace_semp_config
+        api_class: MsgVpnApi
+        config_class: Configuration
+        client_class: ApiClient
+      monitor:
+        module: solace_semp_monitor
+        api_class: MsgVpnApi
+        config_class: Configuration
+        client_class: ApiClient
+      action:
+        module: solace_semp_action
+        api_class: MsgVpnApi
+        config_class: Configuration
+        client_class: ApiClient
+
+## Running
+
+The yaml config needs to be mounted at a specific location inside the container.
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        unixunion/pysolpro:alpha-1 config --help
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        unixunion/pysolpro:alpha-1 config create_msg_vpn --help
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        unixunion/pysolpro:alpha-1 \
+        config get_msg_vpns
+
+You will need to mount any solace managed object yaml too.
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        -v `pwd`/data:/data  unixunion/pysolpro:alpha-1 \
+        config create_msg_vpn --body /data/vpn.yaml
+
