@@ -52,6 +52,11 @@ Generate the python-config API for the version of the appliance you need using h
     for module in *; do cd $module; python setup.py install; cd ..; done
     pip install pyyaml
 
+Optional extras
+
+    pip install argcomplete
+    pip install coloredlogs
+
 Now clone https://github.com/unixunion/py-solace-provision.git
 
 ## Configure
