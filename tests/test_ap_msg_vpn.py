@@ -3,10 +3,7 @@ import logging
 import unittest
 from unittest import TestCase
 
-import solace_semp_config
-
 from sp.AutoApi import AutoApi
-from sp.legacy.common import gen_creds, http_semp_request
 from sp.util import get_client
 
 import solace_semp_action
