@@ -45,25 +45,7 @@ API's exposed.
         config_class: Configuration
         client_class: ApiClient
     
-Note, older versions of Solace don't have the `AllApi`, so if you get an error about AllApi not found in module, you 
-should use `MsgVpnApi` instead. e.g:
 
-    commands:
-      config:
-        module: solace_semp_config
-        api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
-      monitor:
-        module: solace_semp_monitor
-        api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
-      action:
-        module: solace_semp_action
-        api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
 
 ## Running
 
@@ -103,3 +85,113 @@ The output from the above can be saved to file, and used as body payload for CRU
 See https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn/createMsgVpn for
 more information about what fields should be present.
 
+### Tutorial
+
+Download the [source](https://github.com/unixunion/py-solace-provision) code to get the [data](https://github.com/unixunion/py-solace-provision/tree/master/data) examples.
+
+    git clone https://github.com/unixunion/py-solace-provision.git
+
+Bring up a local broker or two
+
+    docker-compose up -d
+
+Get the IP address of your desktop from the perspective of the container
+
+    docker run -ti busybox:latest /bin/ip route|awk '/default/ { print $3 }'
+    172.17.0.1
+
+Create a config file using above
+
+    ---
+    solace_config:
+      config:
+        host: http://172.17.0.1/SEMP/v2/config
+        username: admin
+        password: admin
+    commands:
+      config:
+        module: solace_semp_config
+        api_class: MsgVpnApi
+        config_class: Configuration
+        client_class: ApiClient
+
+Run PySolPro
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        unixunion/pysolpro:alpha-9.8.0.12 \
+        config get_msg_vpn \
+            --msg_vpn_name default
+
+Lets provision a Queue using a YAML file
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        -v `pwd`/data:/data  unixunion/pysolpro:alpha-9.8.0.12 \
+        config create_msg_vpn_queue \
+            --msg_vpn_name default --body /data/queue.yaml
+
+Lets change the queue enabled state
+
+    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        -v `pwd`/data:/data unixunion/pysolpro:alpha-9.8.0.12 \
+        config update_msg_vpn_queue \
+            --msg_vpn_name default \
+            --queue_name test \
+            --body /data/queue.yaml \
+            --override enabled false
+
+
+### Common Pitfals
+
+#### Incompatible properties
+
+If downloading yaml from an appliance, some keys need to be removed due to incompatibility. Anything with a null value 
+can be removed. e.g:
+
+    eventServiceWebConnectionCountThreshold:
+      clearPercent: 60
+      clearValue: null
+      setPercent: 80
+      setValue: null
+
+Solace has incompatible keys in some objects, like above. You cannot have clearPercentage and clearValue set at same time. 
+And you will get an error:
+
+    "error":{
+        "code":11,
+        "description":"Conflicting attribute \"clearValue\" used with \"clearPercent\".",
+        "status":"INVALID_PARAMETER"
+    },
+
+
+If you are using the incorrect version of pySolPro to talk to a older appliance, you will get errors about unsupported properties.
+
+    "error":{
+        "code":11,
+        "description":"Unknown attribute 'redeliveryEnabled'",
+        "status":"INVALID_PARAMETER"
+    },
+
+#### Missing AllApi Config
+
+Older versions of the broker do not have the AllApi, in these cases you will get an error like
+
+    AttributeError: module 'solace_semp_config' has no attribute 'AllApi'
+
+Simply change AllApi to MsgVpnApi in the commands config section.
+
+    commands:
+      config:
+        module: solace_semp_config
+        api_class: MsgVpnApi
+        config_class: Configuration
+        client_class: ApiClient
+      monitor:
+        module: solace_semp_monitor
+        api_class: MsgVpnApi
+        config_class: Configuration
+        client_class: ApiClient
+      action:
+        module: solace_semp_action
+        api_class: MsgVpnApi
+        config_class: Configuration
+        client_class: ApiClient

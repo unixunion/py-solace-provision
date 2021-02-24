@@ -72,11 +72,15 @@ class CallProxy(object):
                         # logger.debug("file[v0]: %s" % file[v[0]])
                         # convert the value type to whatever is in there,
                         # TODO FIXME this is probably not None / null safe
-                        if isinstance(file[attrib], bool):
-                            file[attrib] = str2bool(value)
-                        else:
-                            file[attrib] = value
-                        logger.debug("file[%s]: %s" % (attrib, value))
+                        try:
+                            if isinstance(file[attrib], bool):
+                                file[attrib] = str2bool(value)
+                            else:
+                                file[attrib] = value
+                            logger.debug("file[%s]: %s" % (attrib, value))
+                        except Exception as e:
+                            logger.error("unknown attribute, '%s' is not present in file" % attrib)
+                            raise
                 if k == "where" and v is not None:
                     logger.debug("where v: %s" % v)
                     new_where = []
