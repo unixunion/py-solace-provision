@@ -5,7 +5,10 @@ It provides CRUD operations for solace managed objects using YAML files as the u
 
 For source, see https://github.com/unixunion/py-solace-provision
 
-Different versions are provided to different appliance SEMP versions. Choose appropriately.
+Different versions are provided to different appliance SEMP versions. The version of the container is the pysolpro version, 
+followed by the SEMP API version for that version. e.g:
+
+    0.0.1-9.8.0.12 -> pysolpro 0.0.1, for SEMP version 9.8.0.12
 
 ## Config File
 
