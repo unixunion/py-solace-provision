@@ -12,7 +12,7 @@ solace_config:
     host: http://localhost:8080/SEMP/v2/action
     username: admin
     password: admin
-  proxy: http://localhost:5555
+  #proxy: http://localhost:5555
 
 commands:
   config:
