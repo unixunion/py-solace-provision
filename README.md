@@ -252,3 +252,15 @@ To populate the cache, run the --help command:
     ./server.py
     ./client.py config get_msg_vpn_queues --msg_vpn_name default |grep queueName | awk -F ": " '{print $2;}' | \
         xargs -I{} ./client.py config get_msg_vpn_queue_subscriptions --msg_vpn_name default --queue {}
+
+#### Building docker image
+
+Pass the version of SEMP to build for as a buld-arg. See [docker_deps/semp_config](docker_deps/semp_config) for bundled versions.
+You can add your own just by dropping in the appropriate yaml specs.
+
+    docker build --build-arg sempver=9.8.0.12 -t unixunion/pysolpro:dev . 
+
+##### Building all versions
+    
+    cd docker_deps/semp_config
+    for ver in *; do echo $ver; cd ../..; docker build --build-arg sempver=$ver -t unixunion/pysolpro:alpha-$ver .; cd docker_deps/semp_config; done

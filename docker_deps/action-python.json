@@ -1,0 +1,6 @@
+{
+  "projectName": "solace_semp_action",
+  "packageName": "solace_semp_action",
+  "packageVersion": "VERSION",
+  "packageUrl": "https://github.com/unixunion/solace_semp_client.git"
+}
