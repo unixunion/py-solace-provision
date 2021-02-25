@@ -1,4 +1,3 @@
-import hashlib
 import importlib
 import inspect
 import logging
@@ -16,7 +15,9 @@ logger = logging.getLogger('solace-provision')
 # mappings for which field in which data types are used for the name of the file
 file_name_field_in_type_mappings = {
     "MsgVpnQueue": "queueName",
-    "MsgVpn": "msgVpnName"
+    "MsgVpn": "msgVpnName",
+    "DmrCluster": "dmrClusterName",
+    "MsgVpnClientProfile": "clientProfileName"
 }
 
 
@@ -70,19 +71,23 @@ class DataPersist:
                 path = "%s/%s" % (mapped_params.get("msg_vpn_name"), ret_type)
                 for item in args[0]:
                     item = self.delete_nulls(yaml.safe_load(item))
-                    logger.info("save item: %s\n---\n%s" % (path, yaml.dump(item)))
-                    file_n = item[file_name_field_in_type_mappings[ret_type]]
-                    if not file_n:
-                        raise Exception("no mapping for %s" % return_data_type)
-                    self.write_object(item, path, "%s.yaml" % file_n)
+                    try:
+                        file_n = item[file_name_field_in_type_mappings[ret_type]]
+                        logger.info("save item: %s\n---\n%s" % (path, yaml.dump(item)))
+                        self.write_object(item, path, "%s.yaml" % file_n)
+                    except Exception as e:
+                        logger.error("no mapping for %s" % ret_type)
+                        raise Exception("no mapping for %s" % ret_type)
             else:
                 item = self.delete_nulls(yaml.safe_load(args[0]))
                 path = "%s/%s" % (mapped_params.get("msg_vpn_name"), return_data_type)
-                file_n = item[file_name_field_in_type_mappings[return_data_type]]
-                if not file_n:
+                try:
+                    file_n = item[file_name_field_in_type_mappings[return_data_type]]
+                    logger.info("save item: %s\n---\n%s" % (path, yaml.dump(item)))
+                    self.write_object(item, path, "%s.yaml" % file_n)
+                except Exception as e:
+                    logger.error("no mapping for %s" % return_data_type)
                     raise Exception("no mapping for %s" % return_data_type)
-                logger.info("save item: %s\n---\n%s" % (path, yaml.dump(item)))
-                self.write_object(item, path, "%s.yaml" % file_n)
 
     def write_object(self, data, subpath, file_name):
         filepath = "%s/%s/%s" % (self.save_dir, subpath, file_name)
