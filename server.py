@@ -15,6 +15,7 @@ from solace_semp_monitor import AllApi as MonitorAllApi
 
 import sp.SettingsLoader as settings
 from sp.AutoApi import AutoApi
+from sp.SubCommandConfig import create_subcmd_config
 from sp.nw import send_msg
 from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, process_output, get_client
 
@@ -67,33 +68,24 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         except Exception as e:
             logger.error("exception: %s" % e)
 
-            
-klasses = [
-    {
-        "api": ConfigAllApi,
-        "subcommand": "config",
-        "config_class": solace_semp_config.Configuration,
-        "client_class": solace_semp_config.ApiClient
-    },
-    {
-        "api": MonitorAllApi,
-        "subcommand": "monitor",
-        "config_class": solace_semp_monitor.Configuration,
-        "client_class": solace_semp_monitor.ApiClient
-    },
-    {
-        "api": ActionAllApi,
-        "subcommand": "action",
-        "config_class": solace_semp_action.Configuration,
-        "client_class": solace_semp_action.ApiClient
-    }
-]
+
+klasses = []
+for cmd in settings.commands:
+    logger.debug("init cmd: %s" % cmd)
+    a = create_subcmd_config(cmd,
+                             settings.commands[cmd]["module"],
+                             settings.commands[cmd]["models"],
+                             settings.commands[cmd]["api_class"],
+                             settings.commands[cmd]["config_class"],
+                             settings.commands[cmd]["client_class"])
+    if a:
+        klasses.append(a)
 
 if __name__ == '__main__':
     client_resolver = get_client
 
     parser = argparse.ArgumentParser(prog='pySolPro',
-                                     formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter) # exit_on_error=False
+                                     formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter, exit_on_error=False) # exit_on_error=False
     def x():
         pass
     parser.__setattr__("exit", x)
