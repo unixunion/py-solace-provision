@@ -263,4 +263,8 @@ You can add your own just by dropping in the appropriate yaml specs.
 ##### Building all versions
     
     cd docker_deps/semp_config
-    for ver in *; do echo $ver; cd ../..; docker build --build-arg sempver=$ver -t unixunion/pysolpro:alpha-$ver .; cd docker_deps/semp_config; done
+    ls docker_deps/semp_config | xargs -I {} -t docker build --build-arg sempver={} -t unixunion/pysolpro:0.0.2-{} .
+
+##### Testing all versions
+
+    ls docker_deps/semp_config | xargs -I {} -t docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml unixunion/pysolpro:0.0.2-{} config get_msg_vpn --msg_vpn_name default

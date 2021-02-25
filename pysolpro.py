@@ -17,7 +17,7 @@ except ImportError as e:
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 logger = logging.getLogger("solace-provision")
-# logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 # handler = logging.StreamHandler(sys.stdout)
 # handler.setLevel(logging.DEBUG)
 # formatter = logging.Formatter()
@@ -93,16 +93,20 @@ if __name__ == '__main__':
                     try:
                         generic_output_processor(args.func, args,
                                                  callback=SolaceResponseProcessor(
-                                                     data_callback=DataPersist(args.save)))
+                                                     data_callback=DataPersist(save_data=args.save, save_dir=args.savedir)))
                     except ApiException as e:
                         logger.error("error occurred %s" % e)
+                        sys.exit(1)
                     except AttributeError as e:
                         logger.error("attribute error %s, try adding --help" % e)
+                        sys.exit(1)
                     except TypeError as e:
                         logger.error("type error %s" % e)
+                        sys.exit(1)
                     except Exception as e:
                         logger.error("Exception: %s" % e)
                         parser.print_help()
+                        sys.exit(1)
 
                     sys.exit(0)
 
@@ -147,16 +151,21 @@ if __name__ == '__main__':
             try:
                 generic_output_processor(args.func, args,
                                          callback=SolaceResponseProcessor(
-                                             data_callback=DataPersist(save_data=args.save)))
+                                             data_callback=DataPersist(save_data=args.save, save_dir=args.savedir)))
 
             except ApiException as e:
                 logger.error("error occurred %s" % e)
+                sys.exit(1)
             except AttributeError as e:
                 logger.error("attribute error %s, try adding --help" % e)
+                sys.exit(1)
             except TypeError as e:
                 logger.error("type error %s" % e)
+                sys.exit(1)
             except Exception as e:
                 parser.print_help()
+                sys.exit(1)
         else:
             logger.info("please choose a sub-command")
             parser.print_help()
+            sys.exit(1)
