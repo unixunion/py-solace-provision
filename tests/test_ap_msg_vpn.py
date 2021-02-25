@@ -85,7 +85,7 @@ class TestApMsgVpn(TestCase):
         generic_output_processor(args.func, args,
                                  callback=SolaceResponseProcessor(data_callback=DataPersist(save_data=True)))
         try:
-            f = open("savedata/myvpn2/MsgVpn/564c13a4c1d35b4981b7f6b77936b42c4c0624edeac3dc785841252d.yaml", "r")
+            f = open("savedata/myvpn2/MsgVpn/myvpn2.yaml", "r")
         except Exception as e:
             raise
 
