@@ -192,5 +192,25 @@ def get_type_param_from_doc_strings(method, parameterName):
             return None
 
 
+def get_type_params_from_doc_strings(method):
+    if hasattr(method, "__doc__"):
+        try:
+            type_name = re.findall(':param (.+?) (.+?):', method.__doc__)
+            logger.debug(type_name)
+            return type_name
+        except Exception as e:
+            return []
+
+
+def get_return_type_for_method_docs_trings(method):
+    if hasattr(method, "__doc__"):
+        try:
+            type_name = re.search(':return: (\w+?)\n', method.__doc__)
+            logger.debug(type_name)
+            return type_name.group(1)
+        except Exception as e:
+            return None
+
+
 def str2bool(v):
     return v.lower() in "true"

@@ -17,21 +17,24 @@ solace_config:
 commands:
   config:
     module: solace_semp_config
+    models: solace_semp_config.models
     api_class: AllApi
     config_class: Configuration
     client_class: ApiClient
   monitor:
     module: solace_semp_monitor
+    models: solace_semp_monitor.models
     api_class: AllApi
     config_class: Configuration
     client_class: ApiClient
   action:
     module: solace_semp_action
+    models: solace_semp_action.models
     api_class: AllApi
     config_class: Configuration
     client_class: ApiClient
 
 # used for when running PySolPro server
-SERVER:
-  host: 127.0.0.1
-  port: 65412
+#SERVER:
+#  host: 127.0.0.1
+#  port: 65412

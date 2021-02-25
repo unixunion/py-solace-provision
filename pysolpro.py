@@ -4,6 +4,7 @@
 import logging
 import sys
 
+from sp.DataPersist import DataPersist
 from sp.SubCommandConfig import create_subcmd_config
 
 try:
@@ -36,16 +37,24 @@ active_modules = []
 # argparse cache holder
 apc = None
 
+dp = DataPersist()
+
 
 # a generic data callback, for things like saving yaml
 def arbitrary_data_callback(*args, **kwargs):
-    for arg in args:
-        logger.debug("arg: %s" % arg)
-    logger.debug("kwargs: %s" % kwargs)
+    try:
+        dp.save_object(*args)
+    except Exception as e:
+        logger.error("error saving object: %s" % e)
+        # logger.error(args)
 
-    if args[0]:
-        logger.debug("data process: %s" % args[0])
-        pass
+    # for arg in args:
+    #     logger.debug("arg: %s" % arg)
+    # logger.debug("kwargs: %s" % kwargs)
+    #
+    # if args[0]:
+    #     logger.debug("data process: %s" % args[0])
+    #     pass
 
 
 if __name__ == '__main__':
@@ -75,6 +84,7 @@ if __name__ == '__main__':
 
                     klasses = [create_subcmd_config(cmd,
                                                     settings.commands[cmd]["module"],
+                                                    settings.commands[cmd]["models"],
                                                     settings.commands[cmd]["api_class"],
                                                     settings.commands[cmd]["config_class"],
                                                     settings.commands[cmd]["client_class"])]
@@ -86,7 +96,8 @@ if __name__ == '__main__':
                     args = parser.parse_args()
                     try:
                         generic_output_processor(args.func, args,
-                                                 callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                                                 callback=SolaceResponseProcessor(
+                                                     data_callback=arbitrary_data_callback))
                     except ApiException as e:
                         logger.error("error occurred %s" % e)
                     except AttributeError as e:
@@ -119,6 +130,7 @@ if __name__ == '__main__':
         for cmd in settings.commands:
             klasses.append(create_subcmd_config(cmd,
                                                 settings.commands[cmd]["module"],
+                                                settings.commands[cmd]["models_package"],
                                                 settings.commands[cmd]["api_class"],
                                                 settings.commands[cmd]["config_class"],
                                                 settings.commands[cmd]["client_class"]))

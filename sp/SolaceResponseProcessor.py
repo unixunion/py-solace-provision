@@ -26,11 +26,19 @@ class SolaceResponseProcessor:
             logger.debug("data present")
             if (isinstance(data.data, list)):
                 logger.debug("list response")
+                #TODO FIXME list responses dont desserialize into the plural Response object.
+                # issue with to_good_dict
+                # y = yaml.dump(to_good_dict(data.data))
+                # logger.info("response data\n%s" % y)
+                # if self.data_callback:
+                #     self.data_callback(y, *args, **kwargs)
+                data_list = []
                 for i in data.data:
                     y = yaml.dump(to_good_dict(i))
                     logger.info("response data\n%s" % y)
-                    if self.data_callback:
-                        self.data_callback(y, *args, **kwargs)
+                    data_list.append(y)
+                if self.data_callback:
+                    self.data_callback(data_list, *args, **kwargs)
             else:
                 logger.debug("single response")
                 y = yaml.dump(to_good_dict(data.data))

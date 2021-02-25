@@ -13,30 +13,48 @@ logger.debug("imported")
 # proxy the call and correct the args to be *args instead of key=val
 class CallProxy(object):
     target = None
-    api_instance = None
+    args = None
+    kwargs = None
+    models = None
 
-    def __init__(self, target):
+    def __init__(self, target, models=None):
         self.target = target
+        self.models = models
 
     def __call__(self, *args, **kwargs):
         logger.debug("called for target %s, args: %s kwargs: %s" % (self.target, args, kwargs))
         new_args, new_kwargs = self.resolveArgs(self.target, args)
 
-        cursor = kwargs.get("cursor")
         where = new_kwargs.get("where")
+        if where:
+            kwargs["where"] = where
 
-        if cursor and where:
-            return self.target.__call__(*new_args, cursor=cursor, where=where)
-        elif cursor:
-            return self.target.__call__(*new_args, cursor=cursor)
-        elif where:
-            return self.target.__call__(*new_args, where=where)
-        else:
-            return self.target.__call__(*new_args)
+        self.args = new_args
+        self.kwargs = kwargs
+        return self.target.__call__(*new_args, **kwargs)
 
+    def get_target(self):
+        return self.target
 
-    def getInstance(self):
-        return self.api_instance
+    def get_args(self):
+        """
+        Get the passed args to the call
+        :return:
+        """
+        return self.args
+
+    def get_kwargs(self):
+        """
+        Get the passed kwargs to the call
+        :return:
+        """
+        return self.kwargs
+
+    def get_models(self):
+        return self.models
+
+    # def getInstance(self):
+    #     return self.api_instance
 
     # turns the kwargs from the argparser namespace into plain args, also reads in files for non-primative types
     def resolveArgs(self, method, args: argparse.Namespace):
@@ -68,10 +86,7 @@ class CallProxy(object):
                     logger.debug("v: %s" % v)
                     for attrib, value in v:
                         logger.info("overriding a: %s, v: %s" % (attrib, value))
-                        # logger.debug("overriding %s %s" % (v[0], v[1]))
-                        # logger.debug("file[v0]: %s" % file[v[0]])
-                        # convert the value type to whatever is in there,
-                        # TODO FIXME this is probably not None / null safe
+                        # check if the value in the file is a boolean
                         try:
                             if isinstance(file[attrib], bool):
                                 file[attrib] = str2bool(value)
