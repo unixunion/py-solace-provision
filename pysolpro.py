@@ -46,6 +46,7 @@ def arbitrary_data_callback(*args, **kwargs):
         dp.save_object(*args)
     except Exception as e:
         logger.error("error saving object: %s" % e)
+        raise
         # logger.error(args)
 
     # for arg in args:
@@ -61,6 +62,8 @@ if __name__ == '__main__':
     client_resolver = get_client
 
     parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
+    parser.add_argument("--save", dest="save", action='store_true', default=False, help="save retrieved data to disk")
+    parser.add_argument("--save-dir", dest="savedir", action="store", default="savedata", help="location to save to")
     subparsers = parser.add_subparsers(help='sub-command help')
 
     # if tab-completion, use this
@@ -82,12 +85,14 @@ if __name__ == '__main__':
                 if cmd in settings.commands:
                     logger.debug("command match, limiting subparser init")
 
-                    klasses = [create_subcmd_config(cmd,
-                                                    settings.commands[cmd]["module"],
-                                                    settings.commands[cmd]["models"],
-                                                    settings.commands[cmd]["api_class"],
-                                                    settings.commands[cmd]["config_class"],
-                                                    settings.commands[cmd]["client_class"])]
+                    a = create_subcmd_config(cmd,
+                                             settings.commands[cmd]["module"],
+                                             settings.commands[cmd]["models"],
+                                             settings.commands[cmd]["api_class"],
+                                             settings.commands[cmd]["config_class"],
+                                             settings.commands[cmd]["client_class"])
+                    if a:
+                        klasses=[a]
 
                     from sp.AutoApi import AutoApi
                     from solace_semp_config.rest import ApiException
@@ -97,7 +102,7 @@ if __name__ == '__main__':
                     try:
                         generic_output_processor(args.func, args,
                                                  callback=SolaceResponseProcessor(
-                                                     data_callback=arbitrary_data_callback))
+                                                     data_callback=DataPersist(args.save)))
                     except ApiException as e:
                         logger.error("error occurred %s" % e)
                     except AttributeError as e:
@@ -128,12 +133,14 @@ if __name__ == '__main__':
 
         klasses = []
         for cmd in settings.commands:
-            klasses.append(create_subcmd_config(cmd,
-                                                settings.commands[cmd]["module"],
-                                                settings.commands[cmd]["models_package"],
-                                                settings.commands[cmd]["api_class"],
-                                                settings.commands[cmd]["config_class"],
-                                                settings.commands[cmd]["client_class"]))
+            a = create_subcmd_config(cmd,
+                                     settings.commands[cmd]["module"],
+                                     settings.commands[cmd]["models"],
+                                     settings.commands[cmd]["api_class"],
+                                     settings.commands[cmd]["config_class"],
+                                     settings.commands[cmd]["client_class"])
+            if a:
+                klasses.append(a)
 
         [active_modules.append(m(subparsers, client_resolver, klasses=klasses)) for m in sp_modules]
         # maybe generate cache for argparse
@@ -146,7 +153,8 @@ if __name__ == '__main__':
         if hasattr(args, "func"):
             try:
                 generic_output_processor(args.func, args,
-                                         callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                                         callback=SolaceResponseProcessor(
+                                             data_callback=DataPersist(save_data=args.save)))
 
             except ApiException as e:
                 logger.error("error occurred %s" % e)
