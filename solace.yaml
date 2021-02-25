@@ -18,19 +18,19 @@ commands:
   config:
     module: solace_semp_config
     models: solace_semp_config.models
-    api_class: AllApi
+    api_class: MsgVpnApi
     config_class: Configuration
     client_class: ApiClient
   monitor:
     module: solace_semp_monitor
     models: solace_semp_monitor.models
-    api_class: AllApi
+    api_class: MsgVpnApi
     config_class: Configuration
     client_class: ApiClient
   action:
     module: solace_semp_action
     models: solace_semp_action.models
-    api_class: AllApi
+    api_class: MsgVpnApi
     config_class: Configuration
     client_class: ApiClient
 

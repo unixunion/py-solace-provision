@@ -3,9 +3,10 @@ import logging
 
 logger = logging.getLogger('solace-provision')
 
-def create_subcmd_config(cmd, module_name, models_package, api_class, config_class, client_class):
 
+def create_subcmd_config(cmd, module_name, models_package, api_class, config_class, client_class):
     try:
+        logger.info("importing: %s->%s" % (module_name, api_class))
         _api_class = getattr(importlib.import_module(module_name), api_class)
         _config_class = getattr(importlib.import_module(module_name), config_class)
         _client_class = getattr(importlib.import_module(module_name), client_class)

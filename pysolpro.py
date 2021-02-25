@@ -17,9 +17,9 @@ except ImportError as e:
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 logger = logging.getLogger("solace-provision")
-# logger.setLevel(logging.INFO)
+# logger.setLevel(logging.DEBUG)
 # handler = logging.StreamHandler(sys.stdout)
-# handler.setLevel(logging.INFO)
+# handler.setLevel(logging.DEBUG)
 # formatter = logging.Formatter()
 # handler.setFormatter(formatter)
 # logger.addHandler(handler)
@@ -47,15 +47,6 @@ def arbitrary_data_callback(*args, **kwargs):
     except Exception as e:
         logger.error("error saving object: %s" % e)
         raise
-        # logger.error(args)
-
-    # for arg in args:
-    #     logger.debug("arg: %s" % arg)
-    # logger.debug("kwargs: %s" % kwargs)
-    #
-    # if args[0]:
-    #     logger.debug("data process: %s" % args[0])
-    #     pass
 
 
 if __name__ == '__main__':
@@ -125,6 +116,7 @@ if __name__ == '__main__':
         # import this here because its slow, and we don't want to impede the autocompleter
         # from sp.AutoManageGenerator import AutoManageGenerator
         from sp.AutoApi import AutoApi
+        logger.debug("done")
 
         # list of "plugins" to load
         sp_modules = [
@@ -133,6 +125,7 @@ if __name__ == '__main__':
 
         klasses = []
         for cmd in settings.commands:
+            logger.debug("init cmd: %s" % cmd)
             a = create_subcmd_config(cmd,
                                      settings.commands[cmd]["module"],
                                      settings.commands[cmd]["models"],
