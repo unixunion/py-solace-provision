@@ -3,18 +3,17 @@ import logging
 import unittest
 from unittest import TestCase
 
-from pysolpro import arbitrary_data_callback
-from sp.AutoApi import AutoApi
-from sp.DataPersist import DataPersist
-from sp.SolaceResponseProcessor import SolaceResponseProcessor
-from sp.util import get_client, generic_output_processor
-
 import solace_semp_action
 import solace_semp_config
 import solace_semp_monitor
 from solace_semp_action import AllApi as ActionAllApi
 from solace_semp_config import AllApi as ConfigAllApi
 from solace_semp_monitor import AllApi as MonitorAllApi
+
+from sp.AutoApi import AutoApi
+from sp.DataPersist import DataPersist
+from sp.SolaceResponseProcessor import SolaceResponseProcessor
+from sp.util import get_client, generic_output_processor
 
 # fixme, if parser already has a subcommand in mind, then we dont need to import all of these
 klasses = [
@@ -74,11 +73,22 @@ class TestApMsgVpn(TestCase):
         assert ret.meta.response_code == 200
         assert ret.data.msg_vpn_name == "myvpn2"
 
+    def test_a1_get_msg_vpn(self):
+        args = self.parser.parse_args(['config', 'get_msg_vpn', '--msg_vpn_name', 'myvpn2'])
+        ret = args.func(args)
+        generic_output_processor(args.func, args, callback=SolaceResponseProcessor())
+        assert ret.meta.response_code == 200
+
     def test_a1_get_msg_vpn_and_save(self):
         args = self.parser.parse_args(['config', 'get_msg_vpn', '--msg_vpn_name', 'myvpn2'])
         ret = args.func(args)
         generic_output_processor(args.func, args,
                                  callback=SolaceResponseProcessor(data_callback=DataPersist(save_data=True)))
+        try:
+            f = open("savedata/myvpn2/MsgVpn/564c13a4c1d35b4981b7f6b77936b42c4c0624edeac3dc785841252d.yaml", "r")
+        except Exception as e:
+            raise
+
         assert ret.meta.response_code == 200
 
     def test_a2_override(self):
@@ -89,9 +99,9 @@ class TestApMsgVpn(TestCase):
         ret = args.func(args)
         logger.info(ret)
         assert ret.meta.response_code == 200
+        assert ret.data.enabled is False
 
     def test_delete(self):
         args = self.parser.parse_args(['config', 'delete_msg_vpn', '--msg_vpn_name', 'myvpn2'])
         ret = args.func(args)
         assert ret.meta.response_code == 200
-

@@ -13,6 +13,8 @@ class ArgParserCache:
     cache = {}
     cache_file_name = None
 
+    data_from_parser = {}
+
     def __init__(self, do_load=True, cache_file_name="pysolpro.cache"):
         """
         Instantiate a instance of the argparse cache, if it finds the cache_file on disk, it will load it.
@@ -55,14 +57,17 @@ class ArgParserCache:
                     t = p.choices
                     for subcommand in t:
                         data[subcommand] = {}
-                        choices = t[subcommand]._actions[1].choices
-                        for choice in choices:
-                            logger.debug(choice)
-                            data[subcommand][choice] = []
-                            for opt in choices[choice]._actions:
-                                if opt.option_strings[0] != "-h":
-                                    data[subcommand][choice].append((opt.option_strings[0], opt.dest, opt.help, 'str'))
+                        for spa in t[subcommand]._actions:
+                            if not isinstance(spa, argparse._HelpAction):
+                                choices = spa.choices
+                                for choice in choices:
+                                    logger.debug(choice)
+                                    data[subcommand][choice] = []
+                                    for opt in choices[choice]._actions:
+                                        if opt.option_strings[0] != "-h":
+                                            data[subcommand][choice].append((opt.option_strings[0], opt.dest, opt.help, 'str'))
 
+                    self.data_from_parser = data
                     with open(self.cache_file_name, mode="wb") as f:
                         pickle.dump(data, f)
                         f.close()
@@ -70,6 +75,7 @@ class ArgParserCache:
 
         except Exception as e:
             logger.error("error: %s" % e)
+            raise
 
     def create_subparsers_from_cache(self, subparser):
         """
@@ -95,3 +101,6 @@ class ArgParserCache:
                         y = tmp_group.add_argument(opt, action="store", type=str, help=help)
 
         return subparser
+
+    def get_data_from_parser(self):
+        return self.data_from_parser

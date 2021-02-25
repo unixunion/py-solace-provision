@@ -70,6 +70,7 @@ if __name__ == '__main__':
     finally:
 
         try:
+            # todo fixme this doesnt work since --save and --save-file added
             cmd = sys.argv[1:][0]
             if cmd:
                 logger.debug("args %s" % sys.argv[1:])

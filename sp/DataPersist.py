@@ -13,15 +13,20 @@ from sp.util import get_type_param_from_doc_strings, get_return_type_for_method_
 logger = logging.getLogger('solace-provision')
 
 
-class DataPersist:
+# mappings for which field in which data types are used for the name of the file
+file_name_field_in_type_mappings = {
+    "MsgVpnQueue": "queueName",
+    "MsgVpn": "msgVpnName"
+}
 
+
+class DataPersist:
     save_data = False
     save_dir = None
 
     def __init__(self, save_data=False, save_dir="savedata"):
         self.save_data = save_data
         self.save_dir = save_dir
-
 
     def __call__(self, *args, **kwargs):
         if self.save_data:
@@ -45,7 +50,6 @@ class DataPersist:
                 except Exception as e:
                     pass
 
-
             return_type = get_return_type_for_method_docs_trings(method)
             return_type_class = getattr(importlib.import_module(models), return_type)
             return_data_type = return_type_class.swagger_types['data']
@@ -67,20 +71,24 @@ class DataPersist:
                 for item in args[0]:
                     item = self.delete_nulls(yaml.safe_load(item))
                     logger.info("save item: %s\n---\n%s" % (path, yaml.dump(item)))
-                    self.write_object(item, path, "%s.yaml" % hashlib.sha224(yaml.dump(item).encode("UTF-8")).hexdigest())
+                    file_n = item[file_name_field_in_type_mappings[ret_type]]
+                    if not file_n:
+                        raise Exception("no mapping for %s" % return_data_type)
+                    self.write_object(item, path, "%s.yaml" % file_n)
             else:
                 item = self.delete_nulls(yaml.safe_load(args[0]))
                 path = "%s/%s" % (mapped_params.get("msg_vpn_name"), return_data_type)
+                file_n = item[file_name_field_in_type_mappings[return_data_type]]
+                if not file_n:
+                    raise Exception("no mapping for %s" % return_data_type)
                 logger.info("save item: %s\n---\n%s" % (path, yaml.dump(item)))
-                self.write_object(item, path, "%s.yaml" % hashlib.sha224(yaml.dump(item).encode("UTF-8")).hexdigest())
-
+                self.write_object(item, path, "%s.yaml" % file_n)
 
     def write_object(self, data, subpath, file_name):
         filepath = "%s/%s/%s" % (self.save_dir, subpath, file_name)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "w") as f:
             yaml.dump(data, f, default_flow_style=False)
-
 
     def delete_nulls(self, o):
         for k, v in dict(o).items():

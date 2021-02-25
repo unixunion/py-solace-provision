@@ -42,6 +42,12 @@ class AutoApi(object):
     # scan the doc strings, where a param is found not in the list, add it as a kwarg
     @staticmethod
     def get_all_param_types_from_method(method):
+        """
+        Returns a list of all params from the method sig and doc strings
+
+        @param method: the method
+        @return: list of params
+        """
         params = []
         # get the signature of the method
         sig = inspect.signature(method)
