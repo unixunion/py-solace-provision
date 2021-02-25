@@ -3,8 +3,11 @@ import logging
 import unittest
 from unittest import TestCase
 
+from pysolpro import arbitrary_data_callback
 from sp.AutoApi import AutoApi
-from sp.util import get_client
+from sp.DataPersist import DataPersist
+from sp.SolaceResponseProcessor import SolaceResponseProcessor
+from sp.util import get_client, generic_output_processor
 
 import solace_semp_action
 import solace_semp_config
@@ -17,18 +20,21 @@ from solace_semp_monitor import AllApi as MonitorAllApi
 klasses = [
     {
         "api": ConfigAllApi,
+        "models": "solace_semp_config.models",
         "subcommand": "config",
         "config_class": solace_semp_config.Configuration,
         "client_class": solace_semp_config.ApiClient
     },
     {
         "api": MonitorAllApi,
+        "models": "solace_semp_monitor.models",
         "subcommand": "monitor",
         "config_class": solace_semp_monitor.Configuration,
         "client_class": solace_semp_monitor.ApiClient
     },
     {
         "api": ActionAllApi,
+        "models": "solace_semp_action.models",
         "subcommand": "action",
         "config_class": solace_semp_action.Configuration,
         "client_class": solace_semp_action.ApiClient
@@ -66,6 +72,14 @@ class TestApMsgVpn(TestCase):
         args = self.parser.parse_args(['config', 'create_msg_vpn', '--body', '../data/vpn.yaml'])
         ret = args.func(args)
         assert ret.meta.response_code == 200
+        assert ret.data.msg_vpn_name == "myvpn2"
+
+    def test_a1_get_msg_vpn_and_save(self):
+        args = self.parser.parse_args(['config', 'get_msg_vpn', '--msg_vpn_name', 'myvpn2'])
+        ret = args.func(args)
+        generic_output_processor(args.func, args,
+                                 callback=SolaceResponseProcessor(data_callback=DataPersist(save_data=True)))
+        assert ret.meta.response_code == 200
 
     def test_a2_override(self):
         args = self.parser.parse_args(['config', 'update_msg_vpn', '--msg_vpn_name', 'myvpn2',
@@ -81,17 +95,3 @@ class TestApMsgVpn(TestCase):
         ret = args.func(args)
         assert ret.meta.response_code == 200
 
-    # def test_z_delete_legacy(self):
-    #     client = get_client("config", client_class=solace_semp_config.ApiClient,
-    #                         config_class=solace_semp_config.Configuration)
-    #
-    #     semp_request = """
-    #     <rpc semp-version="soltr/9_0_1VMR">
-    #         <no>
-    #             <message-vpn>
-    #                 <vpn-name>%s</vpn-name>
-    #             </message-vpn>
-    #         </no>
-    #     </rpc>""" % "myvpn2"
-    #     cred, headers = gen_creds(client.configuration.username, client.configuration.password)
-    #     return http_semp_request(client.configuration.host.split("/SEMP")[0], headers, semp_request, None)

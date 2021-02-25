@@ -3,7 +3,7 @@ import logging
 
 from sp.ArgParseCache import ArgParserCache
 from sp.CallProxy import CallProxy
-from sp.util import get_type_param_from_doc_strings, is_primitive
+from sp.util import get_type_param_from_doc_strings, is_primitive, get_type_params_from_doc_strings
 
 logger = logging.getLogger('solace-provision')
 
@@ -26,50 +26,46 @@ class AutoApi(object):
             for provider_api in klasses:
                 subp = subparsers.add_parser(provider_api["subcommand"]).add_subparsers()
                 self.parsers.append(AutoApi.auto_sub_command_arg_parser(subparsers=subp,
-                                                                        command=provider_api["subcommand"],
+                                                                        models=provider_api["models"],
                                                                         apiclass=provider_api["api"],
-                                                                        arg_parser_cache=self.arg_parser_cache,
                                                                         callback=provider_api["api"](
                                                                             api_client=client_resolver(
-                                                                                subcommand=provider_api[
-                                                                                    "subcommand"],
-                                                                                config_class=provider_api[
-                                                                                    "config_class"],
-                                                                                client_class=provider_api[
-                                                                                    "client_class"]
+                                                                                subcommand=provider_api["subcommand"],
+                                                                                config_class=provider_api["config_class"],
+                                                                                client_class=provider_api["client_class"]
                                                                             )
                                                                         )))
-
-                logger.debug("loaded")
 
     # this is not yet used, it will be used to parse doc strings
     # for additional kwargs not identified in the signature
     # scan the sig, create list of values
     # scan the doc strings, where a param is found not in the list, add it as a kwarg
     @staticmethod
-    def getArgsForMethod(apiclass, method_name):
+    def get_all_param_types_from_method(method):
         params = []
         # get the signature of the method
-        sig = inspect.signature(getattr(apiclass, method_name))
+        sig = inspect.signature(method)
 
         # for each parameter, check its type, and add to the subparsers as needed
         for param in sig.parameters.values():
             params.append(param.name)
 
-        logger.debug("found params in method %s" % method_name)
-        logger.debug(params)
+        tmp = get_type_params_from_doc_strings(method)
+        logger.debug("all params in doc: %s" % tmp)
+        params.extend(tmp)
+
+        logger.debug("found params in method %s, params: %s" % (method, params))
+        return params
 
     # dynamically create the argparser command line options at runtime
     @staticmethod
-    def auto_sub_command_arg_parser(subparsers=None, command=None, apiclass=None, callback=None, arg_parser_cache=None):
+    def auto_sub_command_arg_parser(subparsers=None, models=None, apiclass=None, callback=None):
 
         logger.debug("cache is not loaded, getting methods")
         object_methods = [method_name for method_name in dir(apiclass)
                           if callable(getattr(apiclass, method_name)) and not method_name.startswith(
                 "__") and not method_name.endswith("with_http_info")]
-        logger.debug("got methods")
-
-        logger.debug(object_methods)
+        logger.debug("got methods: %s" % object_methods)
 
         # holder for groups
         groups = []
@@ -77,20 +73,14 @@ class AutoApi(object):
         for method_name in object_methods:
             logger.debug("method: %s " % method_name)
 
-            # create the "method" subparser, sucking the dock strings into the help kwarg
+            # create the "method" subparser and read the methods docstring into the parser help
             tmpGroup = subparsers.add_parser(method_name, help=getattr(apiclass, method_name).__doc__)
 
-            # add to the arg cacher
-            # arg_parser_cache.add_parser(command, method_name, help=getattr(apiclass, method_name).__doc__)
+            # set the callback function for the subparsers group, using the CallProxy to ultimately resolve the callback
+            tmpGroup.set_defaults(func=CallProxy(getattr(callback, method_name), models=models))
 
-            # set the callback for the subparser group, using the CallFixer to resolve the callback
-            tmpGroup.set_defaults(func=CallProxy(getattr(callback, method_name)))
-
-            # add the default to the cacher
-            # arg_parser_cache.add_default(command, apiclass, method_name)
             logger.debug("\tparameters: %s" % inspect.signature(getattr(apiclass, method_name)))
-
-            AutoApi.getArgsForMethod(apiclass, method_name)
+            logger.debug("\tdocstring params: %s" % AutoApi.get_all_param_types_from_method(getattr(apiclass, method_name)))
 
             # get the signature of the method
             sig = inspect.signature(getattr(apiclass, method_name))

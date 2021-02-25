@@ -1,3 +1,4 @@
+import argparse
 import logging
 import pickle
 from argparse import ArgumentParser
@@ -47,20 +48,24 @@ class ArgParserCache:
 
         try:
             logger.info("saving cache to disk")
-            t = parser._actions[1].choices
-            for subcommand in t:
-                data[subcommand] = {}
-                choices = t[subcommand]._actions[1].choices
-                for choice in choices:
-                    logger.debug(choice)
-                    data[subcommand][choice] = []
-                    for opt in choices[choice]._actions:
-                        if opt.option_strings[0] != "-h":
-                            data[subcommand][choice].append((opt.option_strings[0], opt.dest, opt.help, 'str'))
+            # get the "subparser"
+            for p in parser._actions:
+                if isinstance(p, argparse._SubParsersAction):
 
-            with open(self.cache_file_name, mode="wb") as f:
-                pickle.dump(data, f)
-                f.close()
+                    t = p.choices
+                    for subcommand in t:
+                        data[subcommand] = {}
+                        choices = t[subcommand]._actions[1].choices
+                        for choice in choices:
+                            logger.debug(choice)
+                            data[subcommand][choice] = []
+                            for opt in choices[choice]._actions:
+                                if opt.option_strings[0] != "-h":
+                                    data[subcommand][choice].append((opt.option_strings[0], opt.dest, opt.help, 'str'))
+
+                    with open(self.cache_file_name, mode="wb") as f:
+                        pickle.dump(data, f)
+                        f.close()
 
 
         except Exception as e:

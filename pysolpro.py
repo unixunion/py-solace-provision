@@ -4,6 +4,7 @@
 import logging
 import sys
 
+from sp.DataPersist import DataPersist
 from sp.SubCommandConfig import create_subcmd_config
 
 try:
@@ -16,9 +17,9 @@ except ImportError as e:
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 logger = logging.getLogger("solace-provision")
-# logger.setLevel(logging.INFO)
+logger.setLevel(logging.INFO)
 # handler = logging.StreamHandler(sys.stdout)
-# handler.setLevel(logging.INFO)
+# handler.setLevel(logging.DEBUG)
 # formatter = logging.Formatter()
 # handler.setFormatter(formatter)
 # logger.addHandler(handler)
@@ -36,22 +37,24 @@ active_modules = []
 # argparse cache holder
 apc = None
 
+dp = DataPersist()
+
 
 # a generic data callback, for things like saving yaml
 def arbitrary_data_callback(*args, **kwargs):
-    for arg in args:
-        logger.debug("arg: %s" % arg)
-    logger.debug("kwargs: %s" % kwargs)
-
-    if args[0]:
-        logger.debug("data process: %s" % args[0])
-        pass
+    try:
+        dp.save_object(*args)
+    except Exception as e:
+        logger.error("error saving object: %s" % e)
+        raise
 
 
 if __name__ == '__main__':
     client_resolver = get_client
 
     parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
+    parser.add_argument("--save", dest="save", action='store_true', default=False, help="save retrieved data to disk")
+    parser.add_argument("--save-dir", dest="savedir", action="store", default="savedata", help="location to save to")
     subparsers = parser.add_subparsers(help='sub-command help')
 
     # if tab-completion, use this
@@ -73,11 +76,14 @@ if __name__ == '__main__':
                 if cmd in settings.commands:
                     logger.debug("command match, limiting subparser init")
 
-                    klasses = [create_subcmd_config(cmd,
-                                                    settings.commands[cmd]["module"],
-                                                    settings.commands[cmd]["api_class"],
-                                                    settings.commands[cmd]["config_class"],
-                                                    settings.commands[cmd]["client_class"])]
+                    a = create_subcmd_config(cmd,
+                                             settings.commands[cmd]["module"],
+                                             settings.commands[cmd]["models"],
+                                             settings.commands[cmd]["api_class"],
+                                             settings.commands[cmd]["config_class"],
+                                             settings.commands[cmd]["client_class"])
+                    if a:
+                        klasses=[a]
 
                     from sp.AutoApi import AutoApi
                     from solace_semp_config.rest import ApiException
@@ -86,16 +92,21 @@ if __name__ == '__main__':
                     args = parser.parse_args()
                     try:
                         generic_output_processor(args.func, args,
-                                                 callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                                                 callback=SolaceResponseProcessor(
+                                                     data_callback=DataPersist(save_data=args.save, save_dir=args.savedir)))
                     except ApiException as e:
                         logger.error("error occurred %s" % e)
+                        sys.exit(1)
                     except AttributeError as e:
                         logger.error("attribute error %s, try adding --help" % e)
+                        sys.exit(1)
                     except TypeError as e:
                         logger.error("type error %s" % e)
+                        sys.exit(1)
                     except Exception as e:
                         logger.error("Exception: %s" % e)
                         parser.print_help()
+                        sys.exit(1)
 
                     sys.exit(0)
 
@@ -109,6 +120,7 @@ if __name__ == '__main__':
         # import this here because its slow, and we don't want to impede the autocompleter
         # from sp.AutoManageGenerator import AutoManageGenerator
         from sp.AutoApi import AutoApi
+        logger.debug("done")
 
         # list of "plugins" to load
         sp_modules = [
@@ -117,11 +129,15 @@ if __name__ == '__main__':
 
         klasses = []
         for cmd in settings.commands:
-            klasses.append(create_subcmd_config(cmd,
-                                                settings.commands[cmd]["module"],
-                                                settings.commands[cmd]["api_class"],
-                                                settings.commands[cmd]["config_class"],
-                                                settings.commands[cmd]["client_class"]))
+            logger.debug("init cmd: %s" % cmd)
+            a = create_subcmd_config(cmd,
+                                     settings.commands[cmd]["module"],
+                                     settings.commands[cmd]["models"],
+                                     settings.commands[cmd]["api_class"],
+                                     settings.commands[cmd]["config_class"],
+                                     settings.commands[cmd]["client_class"])
+            if a:
+                klasses.append(a)
 
         [active_modules.append(m(subparsers, client_resolver, klasses=klasses)) for m in sp_modules]
         # maybe generate cache for argparse
@@ -134,16 +150,22 @@ if __name__ == '__main__':
         if hasattr(args, "func"):
             try:
                 generic_output_processor(args.func, args,
-                                         callback=SolaceResponseProcessor(data_callback=arbitrary_data_callback))
+                                         callback=SolaceResponseProcessor(
+                                             data_callback=DataPersist(save_data=args.save, save_dir=args.savedir)))
 
             except ApiException as e:
                 logger.error("error occurred %s" % e)
+                sys.exit(1)
             except AttributeError as e:
                 logger.error("attribute error %s, try adding --help" % e)
+                sys.exit(1)
             except TypeError as e:
                 logger.error("type error %s" % e)
+                sys.exit(1)
             except Exception as e:
                 parser.print_help()
+                sys.exit(1)
         else:
             logger.info("please choose a sub-command")
             parser.print_help()
+            sys.exit(1)

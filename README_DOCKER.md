@@ -8,7 +8,7 @@ For source, see https://github.com/unixunion/py-solace-provision
 Different versions are provided to different appliance SEMP versions. The version of the container is the pysolpro version, 
 followed by the SEMP API version for that version. e.g:
 
-    0.0.1-9.8.0.12 -> pysolpro 0.0.1, for SEMP version 9.8.0.12
+    0.0.2-9.8.0.12 -> pysolpro 0.0.2, for SEMP version 9.8.0.12
 
 ## Config File
 
@@ -34,19 +34,23 @@ API's exposed.
     commands:
       config:
         module: solace_semp_config
-        api_class: AllApi
+        models: solace_semp_config.models
+        api_class: MsgVpnApi
         config_class: Configuration
         client_class: ApiClient
       monitor:
         module: solace_semp_monitor
-        api_class: AllApi
+        models: solace_semp_monitor.models
+        api_class: MsgVpnApi
         config_class: Configuration
         client_class: ApiClient
       action:
         module: solace_semp_action
-        api_class: AllApi
+        models: solace_semp_action.models
+        api_class: MsgVpnApi
         config_class: Configuration
         client_class: ApiClient
+
     
 
 
@@ -55,13 +59,13 @@ API's exposed.
 The yaml config needs to be mounted at a specific location inside the container.
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:alpha-9.8.0.12 config --help
+        unixunion/pysolpro:0.0.2-9.8.0.12 config --help
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:alpha-9.8.0.12 config create_msg_vpn --help
+        unixunion/pysolpro:0.0.2-9.8.0.12 config create_msg_vpn --help
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:alpha-9.8.0.12 \
+        unixunion/pysolpro:0.0.2-9.8.0.12 \
         config get_msg_vpns
 
 
@@ -71,7 +75,7 @@ Every solace managed object can be provisioned and updated from YAML data. The y
 container. e.g:
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:alpha-9.8.0.12 \
+        -v `pwd`/data:/data  unixunion/pysolpro:0.0.2-9.8.0.12 \
         config create_msg_vpn --body /data/vpn.yaml
 
 ### Yaml Examples
@@ -80,7 +84,7 @@ In order to create YAML [data](https://github.com/unixunion/py-solace-provision/
 such as credentials, and certificates.
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:alpha-9.8.0.12 \
+        -v `pwd`/data:/data  unixunion/pysolpro:0.0.2-9.8.0.12 \
         config get_msg_vpn --msg_vpn_name default
 
 The output from the above can be saved to file, and used as body payload for CRUD operations. 
@@ -88,7 +92,17 @@ The output from the above can be saved to file, and used as body payload for CRU
 See https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html#/msgVpn/createMsgVpn for
 more information about what fields should be present.
 
-### Tutorial
+### Saving Yaml
+
+An experimental option `--save` and `--save-dir` allow retrieved objects to write out to the savedir location. 
+
+    docker run -v `pwd`/output:/savedata \
+        -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        unixunion/pysolpro:0.0.2-9.8.0.12 \
+            --save --save-dir /savedata \
+                config get_msg_vpn --msg_vpn_name default 
+
+## Tutorial
 
 Download the [source](https://github.com/unixunion/py-solace-provision) code to get the [data](https://github.com/unixunion/py-solace-provision/tree/master/data) examples.
 
@@ -114,6 +128,7 @@ Create a config file using above
     commands:
       config:
         module: solace_semp_config
+        models: solace_semp_config.models
         api_class: MsgVpnApi
         config_class: Configuration
         client_class: ApiClient
@@ -121,21 +136,21 @@ Create a config file using above
 Run PySolPro
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:alpha-9.8.0.12 \
+        unixunion/pysolpro:0.0.2-9.8.0.12 \
         config get_msg_vpn \
             --msg_vpn_name default
 
 Lets provision a Queue using a YAML file
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:alpha-9.8.0.12 \
+        -v `pwd`/data:/data  unixunion/pysolpro:0.0.2-9.8.0.12 \
         config create_msg_vpn_queue \
             --msg_vpn_name default --body /data/queue.yaml
 
 Lets change the queue enabled state
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data unixunion/pysolpro:alpha-9.8.0.12 \
+        -v `pwd`/data:/data unixunion/pysolpro:0.0.2-9.8.0.12 \
         config update_msg_vpn_queue \
             --msg_vpn_name default \
             --queue_name test \
@@ -148,7 +163,7 @@ Lets change the queue enabled state
 #### Incompatible properties
 
 If downloading yaml from an appliance, some keys need to be removed due to incompatibility. Anything with a null value 
-can be removed. e.g:
+can be removed. The --save option will do this automatically e.g:
 
     eventServiceWebConnectionCountThreshold:
       clearPercent: 60
@@ -184,17 +199,20 @@ Simply change AllApi to MsgVpnApi in the commands config section.
 
     commands:
       config:
-        module: solace_semp_config
+        ..
         api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
+        ..
       monitor:
-        module: solace_semp_monitor
+        ..
         api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
+        ..
       action:
-        module: solace_semp_action
+        ..
         api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
+        ..
+
+
+#### Missing Action and Monitor API
+
+Versions of SEMPv2 before 9.1.0.77 did not ship with the specification for these commands. Simply remove them from the
+yaml configuration.

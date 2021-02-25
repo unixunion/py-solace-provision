@@ -1,0 +1,142 @@
+alias: ''
+authenticationBasicEnabled: true
+authenticationBasicProfileName: ''
+authenticationBasicRadiusDomain: ''
+authenticationBasicType: internal
+authenticationClientCertAllowApiProvidedUsernameEnabled: false
+authenticationClientCertEnabled: false
+authenticationClientCertMaxChainDepth: 3
+authenticationClientCertRevocationCheckMode: allow-valid
+authenticationClientCertUsernameSource: common-name
+authenticationClientCertValidateDateEnabled: true
+authenticationKerberosAllowApiProvidedUsernameEnabled: false
+authenticationKerberosEnabled: false
+authenticationOauthDefaultProviderName: ''
+authenticationOauthEnabled: false
+authorizationLdapGroupMembershipAttributeName: memberOf
+authorizationLdapTrimClientUsernameDomainEnabled: false
+authorizationProfileName: ''
+authorizationType: internal
+bridgingTlsServerCertEnforceTrustedCommonNameEnabled: true
+bridgingTlsServerCertMaxChainDepth: 3
+bridgingTlsServerCertValidateDateEnabled: true
+bridgingTlsServerCertValidateNameEnabled: true
+distributedCacheManagementEnabled: true
+dmrEnabled: true
+enabled: true
+eventConnectionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventEgressFlowCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventEgressMsgRateThreshold:
+  clearValue: 10
+  setValue: 40
+eventEndpointCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventIngressFlowCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventIngressMsgRateThreshold:
+  clearValue: 10
+  setValue: 40
+eventLargeMsgThreshold: 1000
+eventLogTag: myvpnlog
+eventMsgSpoolUsageThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventPublishClientEnabled: false
+eventPublishMsgVpnEnabled: false
+eventPublishSubscriptionMode: 'off'
+eventPublishTopicFormatMqttEnabled: false
+eventPublishTopicFormatSmfEnabled: true
+eventServiceAmqpConnectionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventServiceMqttConnectionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventServiceRestIncomingConnectionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventServiceSmfConnectionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventServiceWebConnectionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventSubscriptionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventTransactedSessionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+eventTransactionCountThreshold:
+  clearPercent: 40
+  setPercent: 60
+exportSubscriptionsEnabled: false
+jndiEnabled: false
+maxConnectionCount: 9000
+maxEgressFlowCount: 16000
+maxEndpointCount: 16000
+maxIngressFlowCount: 16000
+maxMsgSpoolUsage: 128
+maxSubscriptionCount: 100
+maxTransactedSessionCount: 10
+maxTransactionCount: 10
+mqttRetainMaxMemory: -1
+msgVpnName: myvpn2
+replicationAckPropagationIntervalMsgCount: 20
+replicationBridgeAuthenticationBasicClientUsername: ''
+replicationBridgeAuthenticationScheme: basic
+replicationBridgeCompressedDataEnabled: false
+replicationBridgeEgressFlowWindowSize: 255
+replicationBridgeRetryDelay: 3
+replicationBridgeTlsEnabled: false
+replicationBridgeUnidirectionalClientProfileName: '#client-profile'
+replicationEnabled: false
+replicationQueueMaxMsgSpoolUsage: 64
+replicationQueueRejectMsgToSenderOnDiscardEnabled: true
+replicationRejectMsgWhenSyncIneligibleEnabled: false
+replicationRole: standby
+replicationTransactionMode: async
+restTlsServerCertEnforceTrustedCommonNameEnabled: true
+restTlsServerCertMaxChainDepth: 3
+restTlsServerCertValidateDateEnabled: true
+restTlsServerCertValidateNameEnabled: true
+sempOverMsgBusAdminClientEnabled: false
+sempOverMsgBusAdminDistributedCacheEnabled: false
+sempOverMsgBusAdminEnabled: false
+sempOverMsgBusEnabled: true
+sempOverMsgBusShowEnabled: false
+serviceAmqpMaxConnectionCount: 20
+serviceAmqpPlainTextEnabled: false
+serviceAmqpPlainTextListenPort: 0
+serviceAmqpTlsEnabled: false
+serviceAmqpTlsListenPort: 0
+serviceMqttMaxConnectionCount: 20
+serviceMqttPlainTextEnabled: false
+serviceMqttPlainTextListenPort: 0
+serviceMqttTlsEnabled: false
+serviceMqttTlsListenPort: 0
+serviceMqttTlsWebSocketEnabled: false
+serviceMqttTlsWebSocketListenPort: 0
+serviceMqttWebSocketEnabled: false
+serviceMqttWebSocketListenPort: 0
+serviceRestIncomingAuthorizationHeaderHandling: drop
+serviceRestIncomingMaxConnectionCount: 20
+serviceRestIncomingPlainTextEnabled: false
+serviceRestIncomingPlainTextListenPort: 0
+serviceRestIncomingTlsEnabled: false
+serviceRestIncomingTlsListenPort: 0
+serviceRestMode: messaging
+serviceRestOutgoingMaxConnectionCount: 100
+serviceSmfMaxConnectionCount: 100
+serviceSmfPlainTextEnabled: true
+serviceSmfTlsEnabled: true
+serviceWebMaxConnectionCount: 100
+serviceWebPlainTextEnabled: true
+serviceWebTlsEnabled: true
+tlsAllowDowngradeToPlainTextEnabled: false
