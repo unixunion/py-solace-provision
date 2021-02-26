@@ -51,8 +51,8 @@ API's exposed.
         config_class: Configuration
         client_class: ApiClient
 
-If your version of the broker is greater than 9.3.0.0, it supports the SEMP `AllApi`, use that instead of `MsgVpnApi` to
-get controll of even more configurations.
+If your version of the broker is greater than 9.3.0.0, it supports the SEMP `AllApi`, use that for `api_class` instead of 
+`MsgVpnApi` to get control of even more configurations.
 
 
 ## Running
@@ -105,6 +105,40 @@ The optiion `--save` and `--save-dir` allow retrieved objects to write out to th
             config get_msg_vpn --msg_vpn_name default 
 
 As mentioned above, some fields are not yet gettable, like secrets. 
+
+### Data Mappings
+
+When saving objects, they are organized into a tree structure, grouped by VPN, and "None" for global configs.
+
+    savedata
+    ├── None
+    │   ├── CertAuthority
+    │   │   └── myca.yaml
+    │   ├── ClientCertAuthority
+    │   │   └── test1.yaml
+    │   └── DmrCluster
+    │       └── mydmr.yaml
+    └── myvpn2
+        ├── MsgVpn
+        │   └── myvpn2.yaml
+        ├── MsgVpnAclProfile
+        │   └── myacl.yaml
+        ├── MsgVpnAclProfileClientConnectException
+        │   └── f9599e2002afe4402974dd8e3dbcc9da8358dda47246d5298686dded.yaml
+        ├── MsgVpnAclProfilePublishException
+        │   └── e6b296e0d75e6ef6b4f331ce5aa675ce8a6b82fb8ea788f37b7afc8e.yaml
+        ├── MsgVpnAclProfileSubscribeException
+        │   └── f187b5be725653e82fb10b7a5008f03d0291f10f029eb838fbee09af.yaml
+        ├── MsgVpnClientProfile
+        │   └── some-profile.yaml
+        └── MsgVpnQueue
+            ├── another.queue.name.yaml
+            └── testqueue.yaml
+
+
+How these objects are named, is based on the data_mappings map in the config, which resolved Type to field within that type
+to use as a file_name, or `hashfile` which hashes the payload.
+
 
 ## Tutorial
 

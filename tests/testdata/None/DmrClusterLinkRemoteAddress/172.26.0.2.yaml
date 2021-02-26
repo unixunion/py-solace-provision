@@ -1,0 +1,3 @@
+dmrClusterName: mydmr
+remoteAddress: 172.26.0.2
+remoteNodeName: broker2

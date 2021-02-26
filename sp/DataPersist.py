@@ -31,7 +31,7 @@ class DataPersist:
             logger.debug(self.file_name_field_in_type_mappings)
         except Exception as e:
             logger.error("data_mappings missing from configuration")
-            raise
+            #raise
 
     def __call__(self, *args, **kwargs):
         if self.save_data:
