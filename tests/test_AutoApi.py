@@ -60,7 +60,7 @@ class TestAutoApi(TestCase):
     def test_auto_sub_command_arg_parser(self):
         parser = argparse.ArgumentParser(prog='pySolPro')
         subparsers = parser.add_subparsers(help='sub-command help')
-        subparsers_2 = AutoApi.auto_sub_command_arg_parser(subparsers,
+        AutoApi.auto_sub_command_arg_parser(subparsers,
                                                            models="solace_semp_monitor.models",
                                                            apiclass=MsgVpnApi,
                                                            callback=MsgVpnApi(api_client=ApiClient()))

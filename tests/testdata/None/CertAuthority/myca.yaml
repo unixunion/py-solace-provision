@@ -1,0 +1,63 @@
+certAuthorityName: myca
+certContent: '-----BEGIN CERTIFICATE-----
+
+  MIIEujCCAqICCQChG1a+7dq4MzANBgkqhkiG9w0BAQsFADAfMQswCQYDVQQGEwJa
+
+  QTEQMA4GA1UEAwwHYnJva2VyMTAeFw0yMTAyMjYwODEwMzJaFw0yMjAyMjYwODEw
+
+  MzJaMB8xCzAJBgNVBAYTAlpBMRAwDgYDVQQDDAdicm9rZXIxMIICIjANBgkqhkiG
+
+  9w0BAQEFAAOCAg8AMIICCgKCAgEA4qLs3Esf5LtjiH9bIGXXugNAjQ1eIAxLnJfl
+
+  63A4h+Pf3C9ZxQTWDFqxs1AgleAcFLHNy0AUQBm0mmT9L3dK0VURloCWd22tseZr
+
+  i/JfUAWQ0iAoGbbXdSTQ2Ru66pV65e0eWzb+ps77WblCuSZ15OKxTyvrEtSYNQHa
+
+  woCWXc0lwK4s8UCid9P2ao79TcEgLYNb0DPa52IDDqdjTJk/wSH7uk3tD4nRRr8b
+
+  EEv2OlM1xfdhfKqTWs7m5qlFY9+qMIxKUk0p0oHyyHBylIZ6CylgXkWHJDLA/tYR
+
+  rTWoKjHFXKA8LgPyNA/koIAlGMHNFd+NX/vg2hhIi+ygpth7GLX61UTa/idMvNz4
+
+  bo9EW7GOm9ot9cFtpTpXv7wD+3wMYcmComjANdMo2HEgkcYZP/p61YmGKyUoNvCu
+
+  7wn3iu8DLuJcmV7fDCjrGj2CyB9dHztdKSKRmFAQMIZ1BVxJOgBWOaHQ+0PDOpwS
+
+  2xt+r2U3DwUOPS8LQAG5aghKZo6ks9JDDntAi2x1Oao9loXFYD/zpud0ZcCav43j
+
+  qJSiPAkc8jRwKG+b8jzcYMDEnsF/ToZHiqE6sUzo/HfB67o42hlikNIpMc/ZT8NC
+
+  q11A5NOCt1mMO4colSyAnJlRn4qBCct/PkTsZQsteEQRcH65ujvistsPW+6YRJiI
+
+  t9xaBusCAwEAATANBgkqhkiG9w0BAQsFAAOCAgEApROAVE4rkA3ra+EB0xOqerku
+
+  DglLsOVRCjt7OQo2nbKeCPc1jqT7+TByXrIplk/V6b/4lJSEk3uJOOAfqw+vaiBw
+
+  qac/grN3mZ7PSSM9BSDUgFchnxvzbyEY5/1oyj6FIA+pxjXPnpSpFI0o26tZETPG
+
+  bx7wgaU6dWRDZ6zXgAN3rXzWhyTlsoFudGOX45EzokV2VDC7mskPN9G+MNA4JbXt
+
+  xE6s3xlfpMqDAGu+sMEk3+b4AvAgSlmb+XjTM5Q9fUPp1vP8oUmrpHgEDWCtTU3O
+
+  WgMnIiB9bqB3XuoRx0Ee9MPN8rqaEUNPBBy/lTDuGYfWbsWiMRvOQYtivkWip6fm
+
+  w53pYcw6a5F6oavuAfK15ZLX7vGBFjovSu2TSmyJqpDdiNCGNeQSS3Z0vKGboVsc
+
+  1ir/BmaCswDX2VmGCQl9W4dxnX62N9DIQmnMexGYRM1ZxTwUc4408Bgupu+aT+7E
+
+  /U6i3n+4dCtxdriEkcJil8wZhabAV014g8IcPbT0Dg1IR/6vxbIFmR5ShOSLcSr0
+
+  KswhGaZMUhnJ/RqXMHIk97aQ6d29cBuGRiuV/77s6tMcx9mSyoRcsOjBoM6DVvu3
+
+  +Uz05UWF8y60eaQRthiHKK/EyOjprpVONdGwmJA8WoljFCZfLfbzCpG/CneStZtu
+
+  T5Oono/VIQtLYUxWBOU=
+
+  -----END CERTIFICATE-----'
+crlDayList: daily
+crlTimeList: '3:00'
+crlUrl: http://mycrl
+ocspNonResponderCertEnabled: false
+ocspOverrideUrl: ''
+ocspTimeout: 5
+revocationCheckEnabled: false
