@@ -1,0 +1,9 @@
+certAuthorityName: test1
+certContent: ''
+crlDayList: daily
+crlTimeList: '3:00'
+crlUrl: ''
+ocspNonResponderCertEnabled: false
+ocspOverrideUrl: ''
+ocspTimeout: 5
+revocationCheckEnabled: true

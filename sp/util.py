@@ -195,7 +195,7 @@ def get_type_param_from_doc_strings(method, parameterName):
 def get_type_params_from_doc_strings(method):
     if hasattr(method, "__doc__"):
         try:
-            type_name = re.findall(':param (.+?) (.+?):', method.__doc__)
+            type_name = re.findall('param (.+?) (.+?):', method.__doc__)
             logger.debug(type_name)
             return type_name
         except Exception as e:
