@@ -44,7 +44,7 @@ data_mappings:
   CertAuthority: certAuthorityName
   CertAuthorityOcspTlsTrustedCommonName: ocspTlsTrustedCommonName
   ClientCertAuthority: certAuthorityName
-  ClientCertAuthorityOcspTlsTrustedCommonName: certAuthorityName
+  ClientCertAuthorityOcspTlsTrustedCommonName: ocspTlsTrustedCommonName
   DmrClusterLink: remoteNodeName
   DmrClusterLinkRemoteAddress: remoteAddress
   DmrClusterLinkTlsTrustedCommonName: tlsTrustedCommonName
