@@ -16,7 +16,7 @@ class AutoApi(object):
         """
         Generates argparser, and binds to methods it scans in the klasses list.
 
-        @param subparsers: the subparser to associate commands with, must be a subparser of parser.
+        @param ArgParse._Subparsers subparsers: the subparser to associate commands with, must be a subparser of parser.
         @param client_resolver: the method used to resolve which client to use
         @param klasses: a list of modules, classes and apis scan
         """
