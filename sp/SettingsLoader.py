@@ -14,6 +14,7 @@ except Exception as e:
 
 __yamlfiles__ = [
     "%s" % primary_config,
+    "/solace.yaml",
     '/etc/pysolpro/solace.yaml',
     '/opt/pysolpro/solace.yaml'
 ]
@@ -22,7 +23,7 @@ The settingsloader searches for a solace.yaml file in above locations.
 
 The environment variable: :envvar:`PYSOLPRO_CONFIG` can also be used to specify another file. e.g
 
-    PYSOLPRO_CONFIG="/tmp/my.yaml" ./bin/pysolpro.py ....
+    PYSOLPRO_CONFIG="/tmp/my.yaml" ./pysolpro.py ....
 
 Examples:
 
