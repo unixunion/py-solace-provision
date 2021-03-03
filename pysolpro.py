@@ -4,9 +4,6 @@
 import logging
 import sys
 
-from sp.DataPersist import DataPersist
-from sp.SubCommandConfig import create_subcmd_config
-
 try:
     import coloredlogs
 
@@ -24,7 +21,17 @@ logger.setLevel(logging.INFO)
 # handler.setFormatter(formatter)
 # logger.addHandler(handler)
 
-import sp.SettingsLoader as settings
+# import sp.SettingsLoader as settings
+# import libkplug
+# from libksettings import KSettings/
+# settings = KSettings(config_filename="solace.yaml", MY_HELLO_WORLD_CLASS='HelloWorldPlugin', PLUGINS=['sp.plugins.plugin_helloworld'], load_yaml=True)
+
+import sp
+
+settings = sp.settings
+from sp.DataPersist import DataPersist
+from sp.SubCommandConfig import create_subcmd_config
+
 import argparse
 
 from sp.ArgParseCache import ArgParserCache
@@ -84,7 +91,7 @@ if __name__ == '__main__':
                                              settings.commands[cmd]["config_class"],
                                              settings.commands[cmd]["client_class"])
                     if a:
-                        klasses=[a]
+                        klasses = [a]
 
                     from sp.AutoApi import AutoApi
                     from solace_semp_config.rest import ApiException
@@ -94,7 +101,8 @@ if __name__ == '__main__':
                     try:
                         generic_output_processor(args.func, args,
                                                  callback=SolaceResponseProcessor(
-                                                     data_callback=DataPersist(save_data=args.save, save_dir=args.savedir)))
+                                                     data_callback=DataPersist(save_data=args.save,
+                                                                               save_dir=args.savedir)))
                     except ApiException as e:
                         logger.error("error occurred %s" % e)
                         sys.exit(1)
@@ -121,6 +129,7 @@ if __name__ == '__main__':
         # import this here because its slow, and we don't want to impede the autocompleter
         # from sp.AutoManageGenerator import AutoManageGenerator
         from sp.AutoApi import AutoApi
+
         logger.debug("done")
 
         # list of "plugins" to load

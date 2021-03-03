@@ -44,32 +44,33 @@ Create a virtual environment for this
     python3 -m venv ~/spvenv
     source ~/spvenv/bin/activate
 
-Generate the python-config API for the version of the appliance you need using https://github.com/unixunion/solace_semp_client
+Install dependencies, where SOLACE_VERSION equals your broker version 
 
-    git clone https://github.com/unixunion/solace_semp_client.git
-    cd solace_semp_client
-    ./build.sh python 9.8.0.12
-    cd output
-    for module in *; do cd $module; python setup.py install; cd ..; done
+    # required
     pip install pyyaml
+    pip install solace-semp-config==SOLACE_VERSION
+    
+optional action and monitor api support
+
+    pip install solace-semp-action==SOLACE_VERSION
+    pip install solace-semp-monitor==SOLACE_VERSION
 
 Optional extras
 
     pip install argcomplete
     pip install coloredlogs
 
-Now clone https://github.com/unixunion/py-solace-provision.git
+Now you can run `python pysolpro.py` --help
 
-## Configure
+## Configuring
 
-See solace.yaml for how to set up broker credentials and API endpoints. Config is loaded from locations mentioned in 
-[sp/SettingsLoader.py](sp/SettingsLoader.py). You can override the location of the config with with the environment 
-variable:
+See solace.yaml for how to set up broker credentials and API endpoints. Config is loaded from locations:
+
 
     PYSOLPRO_CONFIG=data/broker1.yaml
 
 The config file also denotes which API's to generate commands for. There are 3 options, `config`, `action` and `monitor`.
-Configuring the API's example:
+Configuring the API's example:with
 
     commands:
       config:
