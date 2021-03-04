@@ -90,15 +90,6 @@ data_mappings:
   MsgVpnTopicEndpointTemplate: topicEndpointTemplateName
 
 
-
-
-
-
-
-
-
-
-
 # used for when running PySolPro server
 SERVER:
   host: 127.0.0.1

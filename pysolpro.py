@@ -26,6 +26,8 @@ logger.setLevel(logging.INFO)
 # from libksettings import KSettings/
 # settings = KSettings(config_filename="solace.yaml", MY_HELLO_WORLD_CLASS='HelloWorldPlugin', PLUGINS=['sp.plugins.plugin_helloworld'], load_yaml=True)
 
+logger.info("pysolpro: https://github.com/unixunion/py-solace-provision")
+
 import sp
 
 settings = sp.settings
@@ -94,7 +96,12 @@ if __name__ == '__main__':
                         klasses = [a]
 
                     from sp.AutoApi import AutoApi
-                    from solace_semp_config.rest import ApiException
+
+                    try:
+                        from solace_semp_config.rest import ApiException
+                    except ImportError as e:
+                        logger.error(sp.solace_semp_unavailable_error)
+                        raise
 
                     aa = AutoApi(subparsers, client_resolver, klasses=klasses)
                     args = parser.parse_args()
@@ -155,7 +162,11 @@ if __name__ == '__main__':
             apc.create_cache_from_parser(parser)
 
         args = parser.parse_args()
-        from solace_semp_config.rest import ApiException
+        try:
+            from solace_semp_config.rest import ApiException
+        except ImportError as e:
+            logger.error(sp.solace_semp_unavailable_error)
+            raise
 
         if hasattr(args, "func"):
             try:
