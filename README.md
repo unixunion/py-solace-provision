@@ -39,6 +39,20 @@ Docker images available at https://hub.docker.com/r/unixunion/pysolpro
 
 ## Installation
 
+### pip
+
+Determine the closest version to your broker version available for [solace-semp-config](https://pypi.org/project/solace-semp-config/#history)
+
+    # install the latest py-solace-provision
+    pip install py-solace-provision
+    # install the closest API version
+    pip install solace-semp-config==SOLACE_VERSION
+    # optionally install action, and monitor API's ( dont install if you dont need it, slows things down )
+    pip install solace-semp-action==SOLACE_VERSION
+    pip install solace-semp-monitor==SOLACE_VERSION
+
+### manual
+
 Create a virtual environment for this
 
     python3 -m venv ~/spvenv
@@ -63,21 +77,22 @@ Optional extras
 
 Now you can run `python pysolpro.py` --help
 
-## Broker Configuring
+## Configuring Broker Access
 
-See solace.yaml for how to set up broker credentials and API endpoints.
+See solace.yaml for how to set up broker credentials and API endpoints. Once set, you can pass the relevant config via an 
+environment property, e.g:
 
-    PYSOLPRO_CONFIG=data/broker1.yaml
+    PYSOLPRO_CONFIG=data/broker1.yaml pysolpro.py config get_msg_vpns
 
-If the config file above is not found, it is searched for in the following locations:
+If the config file above is not immediately found, it is searched for in the following locations:
 
     ".",
     "/",
     "/opt/pysolpro",
     "/etc/pysolpro"
 
-The config file also denotes which API's to generate commands for. There are 3 API's available, `config`, `action` and `monitor`.
-These depend on the `pip` installed `solace-semp-*` packages from Installation steps.
+The config file also denotes which API's pySolPro generates commands for. There are 3 API's available, `config`, `action` 
+and `monitor`. `config` is required, and requires `solace-semp-config` module. Both `action` and `monitor` are optional.  
 
 Configuring the API's example:
 
@@ -278,6 +293,11 @@ To populate the cache, run the --help command:
     ./server.py
     ./client.py config get_msg_vpn_queues --msg_vpn_name default |grep queueName | awk -F ": " '{print $2;}' | \
         xargs -I{} ./client.py config get_msg_vpn_queue_subscriptions --msg_vpn_name default --queue {}
+
+#### Building wheels
+
+    pip install wheel
+    python setup.py bdist_wheel --universal
 
 #### Building docker image
 
