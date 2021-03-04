@@ -5,7 +5,6 @@ from libksettings import KSettings
 
 logger = logging.getLogger("solace-provision")
 
-
 example_config = """---
 solace_config:
   config:
@@ -103,18 +102,16 @@ SERVER:
   port: 65411
 """
 
-
 try:
     settings = KSettings(config_filename="solace.yaml",
-                     config_filename_envvar="PYSOLPRO_CONFIG",
-                     PLUGINS=[],
-                     config_load_locations=[".", "/", "/opt/pysolpro", "/etc/pysolpro"],
-                     load_yaml=True)
-except FileNotFoundError as e:
+                         config_filename_envvar="PYSOLPRO_CONFIG",
+                         PLUGINS=[],
+                         config_load_locations=[".", "/", "/opt/pysolpro", "/etc/pysolpro"],
+                         load_yaml=True)
+except Exception as e:
     logger.error("Example Config:\n %s" % example_config)
     logger.error("Configuration not present, for more info, see https://github.com/unixunion/py-solace-provision")
     sys.exit(1)
-
 
 solace_semp_unavailable_error = "\nUnable to import solace_semp_config, try:\n\n\tpip install " \
                                 "solace_semp_config==SOLACE_VERSION\n\nSee " \
