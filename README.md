@@ -44,10 +44,11 @@ Create a virtual environment for this
     python3 -m venv ~/spvenv
     source ~/spvenv/bin/activate
 
-Install dependencies, where SOLACE_VERSION equals your broker version 
+Install dependencies, where SOLACE_VERSION equals your broker version or closest match. 
+see [https://pypi.org/project/solace-semp-config/](https://pypi.org/project/solace-semp-config/) for available versions 
 
     # required
-    pip install pyyaml
+    pip install -r requirements.txt
     pip install solace-semp-config==SOLACE_VERSION
     
 optional action and monitor api support
@@ -62,15 +63,23 @@ Optional extras
 
 Now you can run `python pysolpro.py` --help
 
-## Configuring
+## Broker Configuring
 
-See solace.yaml for how to set up broker credentials and API endpoints. Config is loaded from locations:
-
+See solace.yaml for how to set up broker credentials and API endpoints.
 
     PYSOLPRO_CONFIG=data/broker1.yaml
 
-The config file also denotes which API's to generate commands for. There are 3 options, `config`, `action` and `monitor`.
-Configuring the API's example:with
+If the config file above is not found, it is searched for in the following locations:
+
+    ".",
+    "/",
+    "/opt/pysolpro",
+    "/etc/pysolpro"
+
+The config file also denotes which API's to generate commands for. There are 3 API's available, `config`, `action` and `monitor`.
+These depend on the `pip` installed `solace-semp-*` packages from Installation steps.
+
+Configuring the API's example:
 
     commands:
       config:
@@ -89,9 +98,9 @@ Configuring the API's example:with
         config_class: Configuration
         client_class: ApiClient
 
-Older versions of SEMP api don't have the AllApi interface, in those cases use MsgVpnApi instead.
+Older versions of SEMPv2 api do not have the `AllApi` interface, in those cases use `MsgVpnApi` instead.
 
-Solace broker configs are grouped per API configured above.
+Solace broker configs are needed for each `API` you want to invoke.
 
     solace_config:
       config:
@@ -115,7 +124,7 @@ by querying the appliance for the relevant object. Note that some attributes are
 GET operations. Some examples are items such as credentials.
 
 Solace has a tendency to have incompatible attributes, and these should be removed from YAML before submitting to appliance. 
-Examples of these are commented out in [data/](/data) files. For example you cannot use clearPercent and clearValue at 
+Examples of these are commented out in [data/](/data) files. For example, you cannot use clearPercent and clearValue at 
 same time.
 
     eventEgressFlowCountThreshold:
@@ -123,6 +132,8 @@ same time.
     #  clearValue: 0
       setPercent: 60
     #  setValue: 0
+
+When using `--save`, these incompatible attributes are null valued, and are removed when writing to disk.
 
 You also cannot mix authentication mechanisms, like password and certificate. Choose one. 
 
@@ -216,15 +227,29 @@ sending them to the appliance.
 
 ### Yaml Files
 
-You can get the YAML representation of a object with almost any of the get_* subcommands, 
-though some fields should be commented out for compatibility reasons. See the data/ examples
+You can get the YAML representation of an object with almost any of the get_* subcommands, 
+though some fields should be commented out for compatibility reasons. See the data/ examples.
 
+#### Saving Yaml
+
+The `--save` option writes out to the retrieved object(s) to the `--save-dir` location.
+
+    python pysolpro.py --save --save-dir savedata config get_msg_vpn --msg_vpn_name default 
+
+You can also save multiple objects when using the "plural" getters.
+
+    python pysolpro.py --save --save-dir savedata config get_msg_vpns
+
+#### Saved File Naming / Mappings
+
+Due to the varying content types of objects, `data_mappings` from the configuration file are used to determine which 
+key in the data to use for the filename, or alternatively hash the payload for smalled config increments.
 
 ### Optional Extras
 #### Tab completion
 
 pySolPro supports tab completion, and will create a cache file named pysolpro.cache upon first invocation. 
-see https://kislyuk.github.io/argcomplete/ for more info
+see [argcomplete](https://kislyuk.github.io/argcomplete/) for more info
 
     pip install argcomplete
 

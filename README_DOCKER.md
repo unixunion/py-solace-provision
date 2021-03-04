@@ -95,7 +95,7 @@ more information about what fields should be present.
 
 ### Saving Yaml
 
-The optiion `--save` and `--save-dir` allow retrieved objects to write out to the savedir location. 
+The option `--save` and `--save-dir` allow retrieved objects to write out to the savedir location. 
 
     docker run -v `pwd`/output:/savedata \
         -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
