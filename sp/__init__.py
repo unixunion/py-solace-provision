@@ -1,5 +1,7 @@
 import logging
 import sys
+import os
+from pathlib import Path
 
 from libksettings import KSettings
 
@@ -103,10 +105,16 @@ SERVER:
 """
 
 try:
+    Path("%s/.pysolpro" % Path.home()).mkdir(exist_ok=True)
+except Exception as e:
+    logger.error("unable to create dir ~/.pysolpro: %s" % e)
+    pass
+
+try:
     settings = KSettings(config_filename="solace.yaml",
                          config_filename_envvar="PYSOLPRO_CONFIG",
                          PLUGINS=[],
-                         config_load_locations=[".", "/", "/opt/pysolpro", "/etc/pysolpro"],
+                         config_load_locations=[".", "%s/.pysolpro" % Path.home(), "/", "/opt/pysolpro", "/etc/pysolpro"],
                          load_yaml=True)
 except Exception as e:
     logger.error("Example Config:\n %s" % example_config)

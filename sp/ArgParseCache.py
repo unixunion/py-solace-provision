@@ -2,6 +2,7 @@ import argparse
 import logging
 import pickle
 from argparse import ArgumentParser
+from pathlib import Path
 
 logger = logging.getLogger('solace-provision')
 logger.debug("imported")
@@ -15,7 +16,7 @@ class ArgParserCache:
 
     data_from_parser = {}
 
-    def __init__(self, do_load=True, cache_file_name="pysolpro.cache"):
+    def __init__(self, do_load=True, cache_file_name="%s/.pysolpro/pysolpro.cache" % Path.home()):
         """
         Instantiate a instance of the argparse cache, if it finds the cache_file on disk, it will load it.
 
@@ -68,9 +69,12 @@ class ArgParserCache:
                                             data[subcommand][choice].append((opt.option_strings[0], opt.dest, opt.help, 'str'))
 
                     self.data_from_parser = data
-                    with open(self.cache_file_name, mode="wb") as f:
-                        pickle.dump(data, f)
-                        f.close()
+                    try:
+                        with open(self.cache_file_name, mode="wb") as f:
+                            pickle.dump(data, f)
+                            f.close()
+                    except Exception as e:
+                        logger.warning("unable to initialize cache file: %s" % e)
 
 
         except Exception as e:
