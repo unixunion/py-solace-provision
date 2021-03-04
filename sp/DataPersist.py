@@ -8,7 +8,9 @@ from collections import OrderedDict
 
 import yaml
 
-import sp.SettingsLoader as settings
+# import sp.SettingsLoader as settings
+import sp
+settings = sp.settings
 
 from sp.util import get_type_param_from_doc_strings, get_return_type_for_method_docs_trings
 

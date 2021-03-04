@@ -44,31 +44,41 @@ Create a virtual environment for this
     python3 -m venv ~/spvenv
     source ~/spvenv/bin/activate
 
-Generate the python-config API for the version of the appliance you need using https://github.com/unixunion/solace_semp_client
+Install dependencies, where SOLACE_VERSION equals your broker version or closest match. 
+see [https://pypi.org/project/solace-semp-config/](https://pypi.org/project/solace-semp-config/) for available versions 
 
-    git clone https://github.com/unixunion/solace_semp_client.git
-    cd solace_semp_client
-    ./build.sh python 9.8.0.12
-    cd output
-    for module in *; do cd $module; python setup.py install; cd ..; done
-    pip install pyyaml
+    # required
+    pip install -r requirements.txt
+    pip install solace-semp-config==SOLACE_VERSION
+    
+optional action and monitor api support
+
+    pip install solace-semp-action==SOLACE_VERSION
+    pip install solace-semp-monitor==SOLACE_VERSION
 
 Optional extras
 
     pip install argcomplete
     pip install coloredlogs
 
-Now clone https://github.com/unixunion/py-solace-provision.git
+Now you can run `python pysolpro.py` --help
 
-## Configure
+## Broker Configuring
 
-See solace.yaml for how to set up broker credentials and API endpoints. Config is loaded from locations mentioned in 
-[sp/SettingsLoader.py](sp/SettingsLoader.py). You can override the location of the config with with the environment 
-variable:
+See solace.yaml for how to set up broker credentials and API endpoints.
 
     PYSOLPRO_CONFIG=data/broker1.yaml
 
-The config file also denotes which API's to generate commands for. There are 3 options, `config`, `action` and `monitor`.
+If the config file above is not found, it is searched for in the following locations:
+
+    ".",
+    "/",
+    "/opt/pysolpro",
+    "/etc/pysolpro"
+
+The config file also denotes which API's to generate commands for. There are 3 API's available, `config`, `action` and `monitor`.
+These depend on the `pip` installed `solace-semp-*` packages from Installation steps.
+
 Configuring the API's example:
 
     commands:
@@ -88,9 +98,9 @@ Configuring the API's example:
         config_class: Configuration
         client_class: ApiClient
 
-Older versions of SEMP api don't have the AllApi interface, in those cases use MsgVpnApi instead.
+Older versions of SEMPv2 api do not have the `AllApi` interface, in those cases use `MsgVpnApi` instead.
 
-Solace broker configs are grouped per API configured above.
+Solace broker configs are needed for each `API` you want to invoke.
 
     solace_config:
       config:
@@ -114,7 +124,7 @@ by querying the appliance for the relevant object. Note that some attributes are
 GET operations. Some examples are items such as credentials.
 
 Solace has a tendency to have incompatible attributes, and these should be removed from YAML before submitting to appliance. 
-Examples of these are commented out in [data/](/data) files. For example you cannot use clearPercent and clearValue at 
+Examples of these are commented out in [data/](/data) files. For example, you cannot use clearPercent and clearValue at 
 same time.
 
     eventEgressFlowCountThreshold:
@@ -122,6 +132,8 @@ same time.
     #  clearValue: 0
       setPercent: 60
     #  setValue: 0
+
+When using `--save`, these incompatible attributes are null valued, and are removed when writing to disk.
 
 You also cannot mix authentication mechanisms, like password and certificate. Choose one. 
 
@@ -215,15 +227,29 @@ sending them to the appliance.
 
 ### Yaml Files
 
-You can get the YAML representation of a object with almost any of the get_* subcommands, 
-though some fields should be commented out for compatibility reasons. See the data/ examples
+You can get the YAML representation of an object with almost any of the get_* subcommands, 
+though some fields should be commented out for compatibility reasons. See the data/ examples.
 
+#### Saving Yaml
+
+The `--save` option writes out to the retrieved object(s) to the `--save-dir` location.
+
+    python pysolpro.py --save --save-dir savedata config get_msg_vpn --msg_vpn_name default 
+
+You can also save multiple objects when using the "plural" getters.
+
+    python pysolpro.py --save --save-dir savedata config get_msg_vpns
+
+#### Saved File Naming / Mappings
+
+Due to the varying content types of objects, `data_mappings` from the configuration file are used to determine which 
+key in the data to use for the filename, or alternatively hash the payload for smalled config increments.
 
 ### Optional Extras
 #### Tab completion
 
 pySolPro supports tab completion, and will create a cache file named pysolpro.cache upon first invocation. 
-see https://kislyuk.github.io/argcomplete/ for more info
+see [argcomplete](https://kislyuk.github.io/argcomplete/) for more info
 
     pip install argcomplete
 
@@ -261,10 +287,19 @@ You can add your own just by dropping in the appropriate yaml specs.
     docker build --build-arg sempver=9.8.0.12 -t unixunion/pysolpro:dev . 
 
 ##### Building all versions
-    
-    cd docker_deps/semp_config
+
     ls docker_deps/semp_config | xargs -I {} -t docker build --build-arg sempver={} -t unixunion/pysolpro:0.0.2-{} .
 
 ##### Testing all versions
 
     ls docker_deps/semp_config | xargs -I {} -t docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml unixunion/pysolpro:0.0.2-{} config get_msg_vpn --msg_vpn_name default
+
+##### Getting all SEMPv2 client whl files
+
+    ls docker_deps/semp_config | xargs -I@ -t docker create unixunion/pysolpro:0.1.1-@ | xargs -I@ docker cp @:/tmp output
+
+##### Releasing wheel to pypi
+
+###### solace_semp_* wheels
+    
+    ls docker_deps/semp_config | xargs -I@ -t docker build --build-arg sempver=@ -t unixunion/pysolpro:0.1.3-@ . -f docker_deps/Dockerfile
