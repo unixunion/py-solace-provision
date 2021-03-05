@@ -9,6 +9,10 @@ logger = logging.getLogger("pysolpro")
 
 example_config = """---
 solace_config:
+  ssl:
+    verify_ssl: True
+    cert: certs/cert.pem
+    
   config:
     host: http://localhost:8080/SEMP/v2/config
     username: admin
