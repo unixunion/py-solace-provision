@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 
 from libksettings import KSettings
@@ -106,7 +107,7 @@ try:
     settings = KSettings(config_filename="solace.yaml",
                          config_filename_envvar="PYSOLPRO_CONFIG",
                          PLUGINS=[],
-                         config_load_locations=[".", "/", "/opt/pysolpro", "/etc/pysolpro"],
+                         config_load_locations=[os.getcwd(), "/", "/opt/pysolpro", "/etc/pysolpro"],
                          load_yaml=True)
 except Exception as e:
     logger.error("Example Config:\n %s" % example_config)
