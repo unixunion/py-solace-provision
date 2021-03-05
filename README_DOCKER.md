@@ -17,6 +17,9 @@ API's exposed.
 
     ---
     solace_config:
+      ssl:
+        verify_ssl: false
+        cert: certs/cert.pem
       config:
         host: http://172.17.0.1:8080/SEMP/v2/config
         username: admin

@@ -34,12 +34,35 @@ class TestApDmr(TestCase):
     def setUp(self):
         self.parser, self.aa = bootstrap()
 
-    def test_b1_create_dmr_cluster(self):
+    def test_b0_create_dmr_cluster(self):
         args = self.parser.parse_args(
             ['config', 'create_dmr_cluster', '--body', 'testdata/None/DmrCluster/mydmr.yaml'])
         ret = args.func(args)
         assert ret.meta.response_code == 200
         assert ret.data.dmr_cluster_name == "mydmr"
+
+    def test_b11_get_dmr_cluster_tls(self):
+        myparser, myaa = bootstrap(tls=True)
+        args = myparser.parse_args(
+            ['--save', '--save-dir', 'savedir', 'config', 'get_dmr_cluster', '--dmr_cluster_name', 'mydmr', '--opaque_password', 'superssecreet'])
+        ret = args.func(args)
+        print(ret)
+        assert ret.meta.response_code == 200
+        assert ret.data.dmr_cluster_name == "mydmr"
+        assert ret.data.authentication_basic_password != ''
+
+    def test_b111_update_dmr_cluster_tls(self):
+        myparser, myaa = bootstrap(tls=True)
+        args = myparser.parse_args(
+            ['config', 'update_dmr_cluster',
+             '--dmr_cluster_name', 'mydmr',
+             '--body', 'testdata/None/DmrCluster/mydmr-enc.yaml',
+             '--opaque_password', 'superssecreet'])
+        ret = args.func(args)
+        print(ret)
+        assert ret.meta.response_code == 200
+        assert ret.data.dmr_cluster_name == "mydmr"
+        assert ret.data.authentication_basic_password != None
 
     def test_b2_save_dmr_cluster(self):
         args = self.parser.parse_args(

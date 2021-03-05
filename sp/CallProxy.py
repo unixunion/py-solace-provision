@@ -29,8 +29,13 @@ class CallProxy(object):
         if where:
             kwargs["where"] = where
 
+        opaque_password = new_kwargs.get("opaque_password")
+        if opaque_password:
+            kwargs["opaque_password"] = opaque_password
+
         self.args = new_args
         self.kwargs = kwargs
+        logger.debug("calling method with args: %s and kwargs: %s" % (new_args, kwargs))
         return self.target.__call__(*new_args, **kwargs)
 
     def get_target(self):
@@ -67,7 +72,7 @@ class CallProxy(object):
         for a in args:
             logger.debug("a: %s", a)
             for k, v in a._get_kwargs():
-                if not isinstance(v, CallProxy) and k != "override" and k != "where" and v is not None:
+                if not isinstance(v, CallProxy) and k != "override" and k != "where" and  k != "opaque_password" and v is not None:
                     logger.debug("key: %s, argument: %s" % (k, v))
                     dt = get_type_param_from_doc_strings(method, k)
                     if is_primitive(dt):
@@ -103,6 +108,9 @@ class CallProxy(object):
                         new_where.append(select[0])
                     logger.debug("new_where: %s" % new_where)
                     function_kwargs["where"] = new_where
+
+                if k == "opaque_password" and v is not None:
+                    function_kwargs["opaque_password"] = v
 
         if file is not None:
             function_args.append(file)

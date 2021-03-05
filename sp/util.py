@@ -39,6 +39,13 @@ def get_client(subcommand=None, config_class=None, client_class=None):
     config.password = settings.solace_config[subcommand]["password"]
     if "proxy" in settings.solace_config:
         config.proxy = settings.solace_config["proxy"]
+    if "ssl" in settings.solace_config:
+        if "verify_ssl" in settings.solace_config["ssl"]:
+            config.verify_ssl = settings.solace_config["ssl"]["verify_ssl"]
+            logger.debug("verify_ssl is %s" % config.verify_ssl)
+        if "cert" in settings.solace_config["ssl"]:
+            config.ssl_ca_cert = settings.solace_config["ssl"]["cert"]
+            logger.debug("cert is %s" % config.ssl_ca_cert)
 
     client = client_class(configuration=config)
 

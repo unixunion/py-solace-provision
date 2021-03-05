@@ -115,6 +115,11 @@ class AutoApi(object):
                 tmpGroup.add_argument("--where", nargs=1, action="append", type=str,
                                       help="where filter to apply, e.g: msgVpnName==def*")
 
+            y = get_type_param_from_doc_strings(getattr(apiclass, method_name), "opaque_password")
+            if y:
+                tmpGroup.add_argument("--opaque_password", action="store", type=str,
+                                      help="password used to make retrieved secretes opaque")
+
             groups.append(tmpGroup)  # this is probably not needed
         logger.debug("created sub-parsers")
         return subparsers

@@ -15,6 +15,9 @@ Create solace.yaml
 
     ---
     solace_config:
+      ssl:
+        verify_ssl: false
+        cert: certs/cert.pem
       config:
         host: http://localhost:8080/SEMP/v2/config
         username: admin

@@ -1,27 +1,20 @@
-import logging
-import os
-import sys
-from pathlib import Path
-
-from libksettings import KSettings
-
-logger = logging.getLogger("pysolpro")
-
-example_config = """---
+---
 solace_config:
+  ssl:
+    verify_ssl: True
+    cert: ../certs/cert.pem
   config:
-    host: http://localhost:8080/SEMP/v2/config
+    host: https://localhost:8843/SEMP/v2/config
     username: admin
     password: admin
   monitor:
-    host: http://localhost:8080/SEMP/v2/monitor
+    host: https://localhost:8843/SEMP/v2/monitor
     username: admin
     password: admin
   action:
-    host: http://localhost:8080/SEMP/v2/action
+    host: https://localhost:8843/SEMP/v2/action
     username: admin
     password: admin
-  #proxy: http://localhost:5555
 
 commands:
   config:
@@ -29,7 +22,7 @@ commands:
     models: solace_semp_config.models
     api_class: AllApi
     config_class: Configuration
-    client_class: ApiClient
+    client_class: ApiClients
   monitor:
     module: solace_semp_monitor
     models: solace_semp_monitor.models
@@ -53,7 +46,7 @@ data_mappings:
   CertAuthority: certAuthorityName
   CertAuthorityOcspTlsTrustedCommonName: ocspTlsTrustedCommonName
   ClientCertAuthority: certAuthorityName
-  ClientCertAuthorityOcspTlsTrustedCommonName: ocspTlsTrustedCommonName
+  ClientCertAuthorityOcspTlsTrustedCommonName: certAuthorityName
   DmrClusterLink: remoteNodeName
   DmrClusterLinkRemoteAddress: remoteAddress
   DmrClusterLinkTlsTrustedCommonName: tlsTrustedCommonName
@@ -98,29 +91,7 @@ data_mappings:
   MsgVpnTopicEndpoint: topicEndpointName
   MsgVpnTopicEndpointTemplate: topicEndpointTemplateName
 
-# used for when running PySolPro server
+
 SERVER:
   host: 127.0.0.1
-  port: 65411
-"""
-
-try:
-    Path("%s/.pysolpro" % Path.home()).mkdir(exist_ok=True)
-except Exception as e:
-    logger.error("unable to create dir ~/.pysolpro: %s" % e)
-    pass
-
-try:
-    settings = KSettings(config_filename="solace.yaml",
-                         config_filename_envvar="PYSOLPRO_CONFIG",
-                         PLUGINS=[],
-                         config_load_locations=[os.getcwd(), "%s/.pysolpro" % Path.home(), "/", "/opt/pysolpro", "/etc/pysolpro"],
-                         load_yaml=True)
-except Exception as e:
-    logger.error("Example Config:\n %s" % example_config)
-    logger.error("Configuration not present, for more info, see https://github.com/unixunion/py-solace-provision")
-    sys.exit(1)
-
-solace_semp_unavailable_error = "\nUnable to import solace_semp_config, try:\n\n\tpip install " \
-                                "solace_semp_config==SOLACE_VERSION\n\nSee " \
-                                "https://pypi.org/project/solace-semp-config/#history for available versions\n\n "
+  port: 65412

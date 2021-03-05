@@ -1,0 +1,6 @@
+aclProfileName: myacl
+clientConnectDefaultAction: allow
+msgVpnName: myvpn2
+publishTopicDefaultAction: allow
+subscribeShareNameDefaultAction: allow
+subscribeTopicDefaultAction: allow

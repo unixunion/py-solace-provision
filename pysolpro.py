@@ -4,17 +4,18 @@
 import logging
 import sys
 
+
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger("pysolpro")
+logger.setLevel(logging.INFO)
+
 try:
     import coloredlogs
-
     coloredlogs.install()
 except ImportError as e:
     pass
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
-logger = logging.getLogger("pysolpro")
-logger.setLevel(logging.INFO)
 # handler = logging.StreamHandler(sys.stdout)
 # handler.setLevel(logging.DEBUG)
 # formatter = logging.Formatter()

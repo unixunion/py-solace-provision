@@ -1,7 +1,9 @@
+---
 authenticationBasicEnabled: true
+authenticationBasicPassword: oUpwrINc/uO3EvBoOlkIUQ==Cli7ENGN2rOmHprhhFbBxw==9oVq3fFwSMSLIrcwj/+6DxNEGr08eO8wnFdYUw3D3IiS/PoyK5U9YGIAc1/oU8FFYG3DUQcNyGmQkooYJ3Au4XX+i1xeDG0rlYzFXg7xT1y/xJCWDlJ8NZhcxzBFrVDOMMTx3gpjoRXl7ZxWlWmx5ZXXdSw87u2pGwcrPbrgZFg=
 authenticationBasicType: internal
+authenticationClientCertContent: ''
 authenticationClientCertEnabled: true
-authenticationBasicPassword: password
 directOnlyEnabled: false
 dmrClusterName: mydmr
 enabled: false

@@ -3,15 +3,17 @@ import argparse
 import solace_semp_action
 import solace_semp_config
 import solace_semp_monitor
+from libksettings import KSettings
 from solace_semp_action import AllApi as ActionAllApi
 from solace_semp_config import AllApi as ConfigAllApi
 from solace_semp_monitor import AllApi as MonitorAllApi
 
+import sp
 from sp.AutoApi import AutoApi
 from sp.util import get_client
 
 
-def bootstrap():
+def bootstrap(tls=False):
     klasses = [
         {
             "api": ConfigAllApi,
@@ -36,6 +38,8 @@ def bootstrap():
         }
     ]
     client = get_client
+    if tls:
+        sp.settings = KSettings(config_filename="solace_tls.yaml")
 
     parser = argparse.ArgumentParser(prog='pySolPro')
     parser.add_argument("--save", dest="save", action='store_true', default=False,

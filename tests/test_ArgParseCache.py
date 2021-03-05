@@ -1,5 +1,6 @@
 import argparse
 import unittest
+from pathlib import Path
 from unittest import TestCase
 
 from sp.ArgParseCache import ArgParserCache
@@ -44,6 +45,6 @@ class TestArgParserCache(TestCase):
     def test_z_cleanup(self):
         import os
         try:
-            os.remove("pysolpro.cache")
+            os.remove("%s/.pysolpro/pysolpro.cache" % Path.home())
         except Exception as e:
             raise

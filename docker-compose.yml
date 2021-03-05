@@ -14,6 +14,7 @@ services:
     ports:
       #SEMP / PubSub+ Manager
       - '8080:8080'
+      - '8843:8843'
       #SMF
       - '55557:55555'
     environment:
@@ -21,6 +22,8 @@ services:
       - username_admin_password=admin
       - system_scaling_maxconnectioncount=1000
       - routername=broker1
+    volumes:
+      - ./certs:/usr/sw/jail/certs
   solace2:
     container_name: broker2
     image: solace/solace-pubsub-standard:9.8.0.12
@@ -41,3 +44,5 @@ services:
       - username_admin_password=admin
       - system_scaling_maxconnectioncount=1000
       - routername=broker2
+#volumes:
+#  certs/cert.pem:

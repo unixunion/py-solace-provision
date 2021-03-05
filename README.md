@@ -141,6 +141,9 @@ Older versions of SEMPv2 api do not have the `AllApi` interface, in those cases 
 Solace broker configs are needed for each `API` you want to invoke.
 
     solace_config:
+      ssl:
+        verify_ssl: false
+        cert: certs/cert.pem
       config:
         host: http://localhost:8080/SEMP/v2/config
         username: admin
@@ -210,6 +213,10 @@ Simply provide what the method's help requires, parameters are passed directly o
 
 
 #### Special parameters
+
+##### --opaque_password
+
+Allows you to upload/download secrets from the appliance. You must be using TLS.
 
 ##### --override
 
@@ -341,3 +348,26 @@ You can add your own just by dropping in the appropriate yaml specs.
 ###### solace_semp_* wheels
 
     ls docker_deps/semp_config | xargs -I@ -t docker build --build-arg sempver=@ -t unixunion/pysolpro:0.1.3-@ . -f docker_deps/Dockerfile
+
+##### Creating self signed cert
+
+    openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365
+    openssl rsa -in key.pem -out nopassskey.pem
+    cat nopassskey.pem >>server.pem
+    cat cert.pem >>server.pem
+
+Jump into the broker and enable TLS
+
+    docker exec -ti broker1 cli
+    enable
+    configure
+    ssl
+    server-certificate server.pem
+    exit
+    service semp
+    shutown
+    listen-port 8843 ssl
+    no shutdown
+
+
+
