@@ -5,21 +5,23 @@ renders the Api into a command-line tool with some basic ability to create, upda
 
 Example:
 
-    pysolpro.py [config|monitor|action] --help  
+```bash
+pysolpro.py [config|monitor|action] --help  
 
-    pysolpro.py config create_msg_vpn --body data/vpn.yaml
+pysolpro.py config create_msg_vpn --body data/vpn.yaml
 
-    pysolpro.py action do_msg_vpn_clear_stats --msg_vpn_name default --body data/empty.yaml
+pysolpro.py action do_msg_vpn_clear_stats --msg_vpn_name default --body data/empty.yaml
 
-    pysolpro.py config update_msg_vpn \
-        --msg_vpn_name myvpn \
-        --body data/vpn.yaml \
-        --override dmrEnabled false \
-        --override enabled false
+pysolpro.py config update_msg_vpn \
+    --msg_vpn_name myvpn \
+    --body data/vpn.yaml \
+    --override dmrEnabled false \
+    --override enabled false
 
-    pysolpro.py action get_msg_vpns --where enabled==false
+pysolpro.py action get_msg_vpns --where enabled==false
 
-    pysolpro.py config get_msg_vpn_queues --msg_vpn_name default 2>&1 | grep queueName
+pysolpro.py config get_msg_vpn_queues --msg_vpn_name default 2>&1 | grep queueName
+```
 
 ## Status
 
@@ -33,66 +35,87 @@ Most commands work with some limitations.
     ./pysolpro.py config update_dmr_cluster --body data/dmr/dmr-cluster.yaml                   
     ERROR type error update_dmr_cluster() missing 1 required positional argument: 'body'
 
+## Dependencies
+
+pySolPro imports one or several libraries available at runtime, [solace-semp-config](https://pypi.org/project/solace-semp-config/#description) library is required. The monitoring and action libraries are optional, and have a performance cost. So dont install monitor or action if you dont intend to use them. 
+
 ## Docker
 
-Docker images available at https://hub.docker.com/r/unixunion/pysolpro
+Docker images are available at https://hub.docker.com/r/unixunion/pysolpro
 
 ## Installation
 
+pySolPro depends on getting the closest version of the [solace-semp-config](https://pypi.org/project/solace-semp-config/#description) library. Use the closest version equal or less than your broker version from the versions available. 
+
 ### pip
 
-Determine the closest version to your broker version available for [solace-semp-config](https://pypi.org/project/solace-semp-config/#history)
+Using pip, you can install pySolPro into your python environment.
 
-    # install the latest py-solace-provision
-    pip install py-solace-provision
-    # install the closest API version
-    pip install solace-semp-config==SOLACE_VERSION
-    # optionally install action, and monitor API's ( dont install if you dont need it, slows things down )
-    pip install solace-semp-action==SOLACE_VERSION
-    pip install solace-semp-monitor==SOLACE_VERSION
+```sh
+pip install py-solace-provision
+pip install solace-semp-config==SOLACE_VERSION
+# optional
+pip install solace-semp-monitor==SOLACE_VERSION
+pip install solace-semp-action==SOLACE_VERSION
+```
 
 ### manual
 
 Create a virtual environment for this
 
-    python3 -m venv ~/spvenv
-    source ~/spvenv/bin/activate
+```bash
+python3 -m venv ~/spvenv
+source ~/spvenv/bin/activate
+```
 
 Install dependencies, where SOLACE_VERSION equals your broker version or closest match. 
 see [https://pypi.org/project/solace-semp-config/](https://pypi.org/project/solace-semp-config/) for available versions 
 
-    # required
-    pip install -r requirements.txt
-    pip install solace-semp-config==SOLACE_VERSION
-    
+```bash
+# required
+pip install -r requirements.txt
+pip install solace-semp-config==SOLACE_VERSION
+```
+
 optional action and monitor api support
 
-    pip install solace-semp-action==SOLACE_VERSION
-    pip install solace-semp-monitor==SOLACE_VERSION
+```bash
+pip install solace-semp-action==SOLACE_VERSION
+pip install solace-semp-monitor==SOLACE_VERSION
+```
 
 Optional extras
 
-    pip install argcomplete
-    pip install coloredlogs
+```sh
+pip install argcomplete
+pip install coloredlogs
+```
 
-Now you can run `python pysolpro.py` --help
+Now you can run `pysolpro.py --help`
 
-## Configuring Broker Access
+## Configuring API
 
-See solace.yaml for how to set up broker credentials and API endpoints. Once set, you can pass the relevant config via an 
-environment property, e.g:
+See [solace.yaml](solace.yaml) for how to set up broker credentials and API endpoint(s). pySolPro searches for a file named `solace.yaml` in several locations listed below, or you can pass the a config filename via an environment property, e.g:
 
-    PYSOLPRO_CONFIG=data/broker1.yaml pysolpro.py config get_msg_vpns
+```bash
+PYSOLPRO_CONFIG=/full/path/to/config.yaml pysolpro.py config get_msg_vpns
+```
 
-If the config file above is not immediately found, it is searched for in the following locations:
+You can also pass a partial path via the environment variable, which will then search the below mentioned locations for that file.
+
+```bash
+PYSOLPRO_CONFIG=relevant/path/to/config.yaml pysolpro.py config get_msg_vpns
+```
+
+If the above relevant config file is not immediately found in the current working directory, it is searched for in the following locations:
 
     ".",
+    "~/.pysolpro/",
     "/",
     "/opt/pysolpro",
     "/etc/pysolpro"
 
-The config file also denotes which API's pySolPro generates commands for. There are 3 API's available, `config`, `action` 
-and `monitor`. `config` is required, and requires `solace-semp-config` module. Both `action` and `monitor` are optional.  
+The config file also denotes which API's pySolPro generates commands for. There are 3 API's available, `config`, `action` and `monitor`. `config` is required, and requires the `solace-semp-config` module. Both `action` and `monitor` are optional, and should not be installed if not using them, as it slows down the command parser.  
 
 Configuring the API's example:
 
@@ -132,15 +155,13 @@ Solace broker configs are needed for each `API` you want to invoke.
         password: admin
 
 
-## Object Files
+## Yaml Object Files
 
 All solace managed objects can be represented as YAML files. see [data/](data/) for some examples. These can be created 
 by querying the appliance for the relevant object. Note that some attributes are NOT retrieved from appliances during 
-GET operations. Some examples are items such as credentials.
+GET operations. Some examples are items such as credentials. There is a task to create this feature using the `opaque_password` parameter.
 
-Solace has a tendency to have incompatible attributes, and these should be removed from YAML before submitting to appliance. 
-Examples of these are commented out in [data/](/data) files. For example, you cannot use clearPercent and clearValue at 
-same time.
+Solace Objects have a tendency to have incompatible attributes, and these should be removed from YAML before submitting to appliance. Examples of these are commented out in [data/](/data) files. For example, you cannot use clearPercent and clearValue at same time.
 
     eventEgressFlowCountThreshold:
       clearPercent: 40
@@ -148,9 +169,9 @@ same time.
       setPercent: 60
     #  setValue: 0
 
-When using `--save`, these incompatible attributes are null valued, and are removed when writing to disk.
+When using `--save`, these most of these incompatible attributes are null valued, and are removed when writing the yaml to disk.
 
-You also cannot mix authentication mechanisms, like password and certificate. Choose one. 
+Other examples of incomatible types are authentication mechanisms, like password and certificate cannot both be used at the same time.
 
     replicationBridgeAuthenticationBasicClientUsername: ""
     replicationBridgeAuthenticationBasicPassword: ""
@@ -165,19 +186,18 @@ The response from the appliance will generally indicate if you have incompatible
             "status":"NOT_ALLOWED"
         },
 
-When using Object Files to create/update managed objects on the broker, you can use the `--override` argument to override 
-any attribute in the YAML files. As an example, this can be used enable/disable services. It can also be used to 
-"template" objects. e.g:
+When using Object Files to create/update managed objects on the broker, you can use the `--override` argument to override any attribute in the YAML files before it is posted to the appliance. As an example, this can be used enable/disable services. It can also be used to "template" objects using the same yaml. e.g:
 
-    pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName myVpn
-    pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName anotherVpnSameYaml
+```bash
+pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName myVpn
+pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName anotherVpnSameYaml
+```
 
-## Running
+## Running pySolPro
 
-Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are 
-labeled in the help as being `file: ClassName`. These must have their argument provide a path to a YAML file.
+Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are labeled in the help as being `file: <ClassName>`. These must have their argument provide a path to a YAML file.
 
-    python pysolpro.py config create_dmr_cluster --help
+    pysolpro.py config create_dmr_cluster --help
     usage: pySolPro config create_msg_vpn [-h] [--body BODY] [--override OVERRIDE OVERRIDE]
     
     optional arguments:
@@ -185,7 +205,7 @@ labeled in the help as being `file: ClassName`. These must have their argument p
       --body BODY           file: MsgVpn
       --override OVERRIDE OVERRIDE
                             key,val in yaml to override, such as enabled false
-
+    
     python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
 
 
@@ -202,12 +222,11 @@ When creating/updating objects on the appliance, you can override any attributes
         --override enabled false \
         --override dmrEnabled false
 
-Multiple `--override` argyments can be provided.
+Multiple `--override` arguments can be provided.
 
 ##### --where
 
-Include in the response only objects where certain conditions are true. Use this query parameter to limit which objects 
-are returned to those whose attribute values meet the given conditions.
+When querying the appliance with get_* commands, the SEMP API can filter the response to only include objects where certain conditions evaluate to true.
 
 The value of where is a comma-separated list of expressions. All expressions must be true for the object to be included 
 in the response. Each expression takes the form:
@@ -218,8 +237,7 @@ OP          = '==' | '!=' | '&lt;' | '&gt;' | '&lt;=' | '&gt;='
 value may be a number, string, true, or false, as appropriate for the type of attribute-name. Greater-than and less-than 
 comparisons only work for numbers. A * in a string value is interpreted as a wildcard (zero or more characters).
 
-Note, only one where condition is supported at the moment, due to Solace not using OpenAPI3. OpenAPI2 does not have `allowReserved`
-keyword in the parameter specification, so the `,` separator is encoded to %2C.
+Note, only one where condition is supported at the moment, due to Solace not using OpenAPI3. OpenAPI2 does not have `allowReserved` keyword in the parameter specification, so the `,` separator is encoded to %2C.
 
 Example:
 
@@ -321,5 +339,5 @@ You can add your own just by dropping in the appropriate yaml specs.
 ##### Releasing wheel to pypi
 
 ###### solace_semp_* wheels
-    
+
     ls docker_deps/semp_config | xargs -I@ -t docker build --build-arg sempver=@ -t unixunion/pysolpro:0.1.3-@ . -f docker_deps/Dockerfile

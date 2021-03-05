@@ -13,7 +13,7 @@ except ImportError as e:
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-logger = logging.getLogger("solace-provision")
+logger = logging.getLogger("pysolpro")
 logger.setLevel(logging.INFO)
 # handler = logging.StreamHandler(sys.stdout)
 # handler.setLevel(logging.DEBUG)

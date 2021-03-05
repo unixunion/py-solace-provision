@@ -3,7 +3,7 @@
 #
 # import yaml
 #
-# logger = logging.getLogger("solace-provision")
+# logger = logging.getLogger("pysolpro")
 #
 # primary_config = 'solace.yaml',
 #

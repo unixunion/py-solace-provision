@@ -5,7 +5,7 @@ from pathlib import Path
 
 from libksettings import KSettings
 
-logger = logging.getLogger("solace-provision")
+logger = logging.getLogger("pysolpro")
 
 example_config = """---
 solace_config:
@@ -114,7 +114,7 @@ try:
     settings = KSettings(config_filename="solace.yaml",
                          config_filename_envvar="PYSOLPRO_CONFIG",
                          PLUGINS=[],
-                         config_load_locations=[".", "%s/.pysolpro" % Path.home(), "/", "/opt/pysolpro", "/etc/pysolpro"],
+                         config_load_locations=["./", "%s/.pysolpro" % Path.home(), "/", "/opt/pysolpro", "/etc/pysolpro"],
                          load_yaml=True)
 except Exception as e:
     logger.error("Example Config:\n %s" % example_config)
