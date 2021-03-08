@@ -14,7 +14,7 @@ services:
     ports:
       #SEMP / PubSub+ Manager
       - '8080:8080'
-      - '8843:8843'
+      - '8843:1943'
       #SMF
       - '55557:55555'
     environment:
