@@ -12,7 +12,7 @@ class AutoApi(object):
 
     parsers = []
 
-    def __init__(self, subparsers, client_resolver, klasses=[]):
+    def __init__(self, subparsers, client_resolver, klasses=[], **kwargs):
         """
         Generates argparser, and binds to methods it scans in the klasses list.
 
@@ -32,7 +32,8 @@ class AutoApi(object):
                                                                             api_client=client_resolver(
                                                                                 subcommand=provider_api["subcommand"],
                                                                                 config_class=provider_api["config_class"],
-                                                                                client_class=provider_api["client_class"]
+                                                                                client_class=provider_api["client_class"],
+                                                                                **kwargs
                                                                             )
                                                                         )))
 
@@ -117,7 +118,7 @@ class AutoApi(object):
 
             y = get_type_param_from_doc_strings(getattr(apiclass, method_name), "opaque_password")
             if y:
-                tmpGroup.add_argument("--opaque_password", action="store", type=str,
+                tmpGroup.add_argument("--opaque_password", dest="opaque_password", action="store", type=str,
                                       help="password used to make retrieved secretes opaque")
 
             groups.append(tmpGroup)  # this is probably not needed

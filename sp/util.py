@@ -22,7 +22,16 @@ def load_class(klassname):
         raise
 
 
-def get_client(subcommand=None, config_class=None, client_class=None):
+def make_kwargs_from_args(args):
+    kw = {}
+    for k in vars(args):
+        if vars(args)[k]:
+            logger.info("adding kwarg: %s:%s" % (k, vars(args)[k]))
+            kw[k] = vars(args)[k]
+    return kw
+
+
+def get_client(subcommand=None, config_class=None, client_class=None, **kwargs):
     """
     Creates a client of the type for the passed parameters.
 
@@ -35,6 +44,7 @@ def get_client(subcommand=None, config_class=None, client_class=None):
     config = config_class()
 
     config.host = settings.solace_config[subcommand]["host"]
+    logger.info("host: %s" % config.host)
     config.username = settings.solace_config[subcommand]["username"]
     config.password = settings.solace_config[subcommand]["password"]
     if "proxy" in settings.solace_config:
@@ -46,6 +56,19 @@ def get_client(subcommand=None, config_class=None, client_class=None):
         if "cert" in settings.solace_config["ssl"]:
             config.ssl_ca_cert = settings.solace_config["ssl"]["cert"]
             logger.debug("cert is %s" % config.ssl_ca_cert)
+
+    for k in kwargs:
+        logger.info("overriding %s with value %s" % (k, kwargs[k]))
+        if k == "host":
+            config.host = kwargs[k]
+        elif k == "username":
+            config.username = kwargs[k]
+        elif k == "password":
+            config.password = kwargs[k]
+        else:
+            logger.error("unknown kwarg: %s" % k)
+
+    config.host = "%s%s" % (config.host, settings.commands[subcommand]["api_path"])
 
     client = client_class(configuration=config)
 
@@ -194,7 +217,7 @@ def get_type_param_from_doc_strings(method, parameterName):
         try:
             type_name = re.search(':param (.+?) %s' % parameterName, method.__doc__)
             if type_name:
-                logger.debug("\t%s: %s" % (parameterName, type_name.group(1)))
+                logger.debug("get_type_param_from_doc_strings %s: %s" % (parameterName, type_name.group(1)))
                 return type_name.group(1)
         except Exception as e:
             return None

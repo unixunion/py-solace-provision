@@ -72,7 +72,8 @@ class CallProxy(object):
         for a in args:
             logger.debug("a: %s", a)
             for k, v in a._get_kwargs():
-                if not isinstance(v, CallProxy) and k != "override" and k != "where" and  k != "opaque_password" and v is not None:
+                # ignored args, which are not part of the positional args of a method
+                if not isinstance(v, CallProxy) and k != "override" and k != "where" and k != "opaque_password" and k != "password" and  k != "username" and k != "host" and v is not None:
                     logger.debug("key: %s, argument: %s" % (k, v))
                     dt = get_type_param_from_doc_strings(method, k)
                     if is_primitive(dt):
@@ -80,12 +81,17 @@ class CallProxy(object):
                         function_args.append(v)
                     elif dt is not None:
                         logger.debug("reading file for type: %s arg: %s" % (dt, v))
-                        with open(v) as f:
-                            file = yaml.safe_load(f)
-                            if file is None:
-                                logger.debug("empty file, making empty instance")
-                                file = {}
-                            logger.debug("read file %s" % file)
+                        try:
+                            with open(v) as f:
+                                file = yaml.safe_load(f)
+                                if file is None:
+                                    logger.debug("empty file, making empty instance")
+                                    file = {}
+                                logger.debug("read file %s" % file)
+                        # older broker
+                        except Exception as e:
+                            logger.warning("unable to load file: %s" % file)
+                            raise
             for k, v in a._get_kwargs():
                 if k == "override" and v is not None:
                     logger.debug("v: %s" % v)

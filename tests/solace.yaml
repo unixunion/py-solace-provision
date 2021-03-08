@@ -1,33 +1,36 @@
 ---
 solace_config:
   config:
-    host: http://localhost:8080/SEMP/v2/config
+    host: http://localhost:8080
     username: admin
     password: admin
   monitor:
-    host: http://localhost:8080/SEMP/v2/monitor
+    host: http://localhost:8080
     username: admin
     password: admin
   action:
-    host: http://localhost:8080/SEMP/v2/action
+    host: http://localhost:8080
     username: admin
     password: admin
   #proxy: http://localhost:5555
 
 commands:
   config:
+    api_path: /SEMP/v2/config
     module: solace_semp_config
     models: solace_semp_config.models
     api_class: AllApi
     config_class: Configuration
     client_class: ApiClient
   monitor:
+    api_path: /SEMP/v2/monitor
     module: solace_semp_monitor
     models: solace_semp_monitor.models
     api_class: AllApi
     config_class: Configuration
     client_class: ApiClient
   action:
+    api_path: /SEMP/v2/action
     module: solace_semp_action
     models: solace_semp_action.models
     api_class: AllApi

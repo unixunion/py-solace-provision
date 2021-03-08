@@ -121,17 +121,23 @@ Configuring the API's example:
 
     commands:
       config:
+        api_path: /SEMP/v2/config
         module: solace_semp_config
+        models: solace_semp_config.models
         api_class: AllApi
         config_class: Configuration
         client_class: ApiClient
       monitor:
+        api_path: /SEMP/v2/monitor
         module: solace_semp_monitor
+        models: solace_semp_monitor.models
         api_class: AllApi
         config_class: Configuration
         client_class: ApiClient
       action:
+        api_path: /SEMP/v2/action
         module: solace_semp_action
+        models: solace_semp_action.models
         api_class: AllApi
         config_class: Configuration
         client_class: ApiClient
@@ -145,15 +151,15 @@ Solace broker configs are needed for each `API` you want to invoke.
         verify_ssl: false
         cert: certs/cert.pem
       config:
-        host: http://localhost:8080/SEMP/v2/config
+        host: http://localhost:8080
         username: admin
         password: admin
       monitor:
-        host: http://localhost:8080/SEMP/v2/monitor
+        host: http://localhost:8080
         username: admin
         password: admin
       action:
-        host: http://localhost:8080/SEMP/v2/action
+        host: http://localhost:8080
         username: admin
         password: admin
 
@@ -200,16 +206,21 @@ pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName ano
 
 Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are labeled in the help as being `file: <ClassName>`. These must have their argument provide a path to a YAML file.
 
-    pysolpro.py config create_dmr_cluster --help
-    usage: pySolPro config create_msg_vpn [-h] [--body BODY] [--override OVERRIDE OVERRIDE]
+    usage: pySolPro [-h] [--save] [--save-dir SAVEDIR] [--host HOST] [--username USERNAME] [--password PASSWORD] {config,monitor,action} ...
+    
+    positional arguments:
+      {config,monitor,action}
+                            sub-command help
     
     optional arguments:
       -h, --help            show this help message and exit
-      --body BODY           file: MsgVpn
-      --override OVERRIDE OVERRIDE
-                            key,val in yaml to override, such as enabled false
+      --save                save retrieved data to disk
+      --save-dir SAVEDIR    location to save to
+      --host HOST           broker host override e.g: https://localhost:8843
+      --username USERNAME   username override
+      --password PASSWORD   password override
     
-    python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
+    PYSOLPRO_CONFIG=/path/to/broker_config.yaml python pysolpro.py config create_dmr_cluster --body data/dmr/dmr-cluster.yaml
 
 
 #### Special parameters

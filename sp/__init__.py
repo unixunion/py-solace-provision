@@ -115,6 +115,7 @@ except Exception as e:
     pass
 
 try:
+    logger.debug("loading pysolpro settings...")
     settings = KSettings(config_filename="solace.yaml",
                          config_filename_envvar="PYSOLPRO_CONFIG",
                          PLUGINS=[],
