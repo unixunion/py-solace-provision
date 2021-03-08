@@ -87,61 +87,6 @@ if __name__ == '__main__':
         logger.warning("auto complete not installed, tab completion disabled")
     finally:
 
-        try:
-            # todo fixme this doesnt work since --save and --save-file added
-            cmd = sys.argv[1:][0]
-            if cmd:
-                logger.debug("args %s" % sys.argv[1:])
-                if cmd in settings.commands:
-                    logger.debug("command match, limiting subparser init")
-
-                    a = create_subcmd_config(cmd,
-                                             settings.commands[cmd]["module"],
-                                             settings.commands[cmd]["models"],
-                                             settings.commands[cmd]["api_class"],
-                                             settings.commands[cmd]["config_class"],
-                                             settings.commands[cmd]["client_class"])
-                    if a:
-                        klasses = [a]
-
-                    from sp.AutoApi import AutoApi
-
-                    try:
-                        from solace_semp_config.rest import ApiException
-                    except ImportError as e:
-                        logger.error(sp.solace_semp_unavailable_error)
-                        raise
-
-                    args, unknown = parser.parse_known_args()
-                    make_kwargs_from_args(args)
-                    aa = AutoApi(subparsers, client_resolver, klasses=klasses)
-                    args = parser.parse_args()
-                    try:
-                        generic_output_processor(args.func, args,
-                                                 callback=SolaceResponseProcessor(
-                                                     data_callback=DataPersist(save_data=args.save,
-                                                                               save_dir=args.savedir)))
-                    except ApiException as e:
-                        logger.error("error occurred %s" % e)
-                        sys.exit(1)
-                    except AttributeError as e:
-                        logger.error("attribute error %s, try adding --help" % e)
-                        sys.exit(1)
-                    except TypeError as e:
-                        logger.error("type error %s" % e)
-                        sys.exit(1)
-                    except Exception as e:
-                        logger.error("Exception: %s" % e)
-                        parser.print_help()
-                        sys.exit(1)
-
-                    sys.exit(0)
-
-
-        except Exception as e:
-            logger.error("Error invoking performance optimized argparse %s" % e)
-            pass
-
         logger.info("initializing all modules")
 
         # import this here because its slow, and we don't want to impede the autocompleter
@@ -155,6 +100,12 @@ if __name__ == '__main__':
             AutoApi
         ]
 
+        try:
+            args, unknown = parser.parse_known_args()
+            kw = make_kwargs_from_args(args)
+        except Exception as e:
+            logger.error(e)
+
         klasses = []
         for cmd in settings.commands:
             logger.debug("init cmd: %s" % cmd)
@@ -163,13 +114,20 @@ if __name__ == '__main__':
                                      settings.commands[cmd]["models"],
                                      settings.commands[cmd]["api_class"],
                                      settings.commands[cmd]["config_class"],
-                                     settings.commands[cmd]["client_class"])
+                                     settings.commands[cmd]["client_class"],
+                                     **kw)
+
+            subp = subparsers.add_parser(cmd).add_subparsers()
+            AutoApi.auto_sub_command_arg_parser(subparsers=subp,
+                                                models=a["models"],
+                                                apiclass=a["api"],
+                                                callback=a["api"](api_client=a["api_client"]))
+
             if a:
                 klasses.append(a)
 
-        args, unknown = parser.parse_known_args()
-        kw = make_kwargs_from_args(args)
-        [active_modules.append(m(subparsers, client_resolver, klasses=klasses, **kw)) for m in sp_modules]
+
+        [active_modules.append(m(None, None)) for m in sp_modules]
         # maybe generate cache for argparse
         if apc:
             apc.create_cache_from_parser(parser)

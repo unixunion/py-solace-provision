@@ -119,3 +119,6 @@ class ArgParserCache:
 
     def get_data_from_parser(self):
         return self.data_from_parser
+
+    def is_loaded(self):
+        return self.loaded

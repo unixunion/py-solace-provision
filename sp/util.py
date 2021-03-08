@@ -26,7 +26,7 @@ def make_kwargs_from_args(args):
     kw = {}
     for k in vars(args):
         if vars(args)[k]:
-            logger.info("adding kwarg: %s:%s" % (k, vars(args)[k]))
+            logger.debug("adding kwarg: %s:%s" % (k, vars(args)[k]))
             kw[k] = vars(args)[k]
     return kw
 
@@ -44,7 +44,7 @@ def get_client(subcommand=None, config_class=None, client_class=None, **kwargs):
     config = config_class()
 
     config.host = settings.solace_config[subcommand]["host"]
-    logger.info("host: %s" % config.host)
+    logger.debug("host: %s" % config.host)
     config.username = settings.solace_config[subcommand]["username"]
     config.password = settings.solace_config[subcommand]["password"]
     if "proxy" in settings.solace_config:
@@ -58,7 +58,8 @@ def get_client(subcommand=None, config_class=None, client_class=None, **kwargs):
             logger.debug("cert is %s" % config.ssl_ca_cert)
 
     for k in kwargs:
-        logger.info("overriding %s with value %s" % (k, kwargs[k]))
+        if k != "password":
+            logger.info("overriding %s with value %s" % (k, kwargs[k]))
         if k == "host":
             config.host = kwargs[k]
         elif k == "username":

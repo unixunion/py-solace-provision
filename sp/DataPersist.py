@@ -36,6 +36,7 @@ class DataPersist:
             #raise
 
     def __call__(self, *args, **kwargs):
+        logger.debug("called with args: %s, kwargs: %s" % (args, kwargs))
         if self.save_data:
 
             # logger.info(args[0])

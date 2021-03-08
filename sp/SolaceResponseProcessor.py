@@ -38,6 +38,7 @@ class SolaceResponseProcessor:
                     logger.info("response data\n%s" % y)
                     data_list.append(y)
                 if self.data_callback:
+                    logger.debug("calling data_callback")
                     self.data_callback(data_list, *args, **kwargs)
             else:
                 logger.debug("single response")
