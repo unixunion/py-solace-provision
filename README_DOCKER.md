@@ -24,15 +24,6 @@ API's exposed.
         host: http://172.17.0.1:8080/SEMP/v2/config
         username: admin
         password: admin
-      monitor:
-        host: http://172.17.0.1:8080/SEMP/v2/monitor
-        username: admin
-        password: admin
-      action:
-        host: http://172.17.0.1:8080/SEMP/v2/action
-        username: admin
-        password: admin
-      #proxy: http://localhost:5555
     
     commands:
       config:
@@ -41,18 +32,10 @@ API's exposed.
         api_class: MsgVpnApi
         config_class: Configuration
         client_class: ApiClient
-      monitor:
-        module: solace_semp_monitor
-        models: solace_semp_monitor.models
-        api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
-      action:
-        module: solace_semp_action
-        models: solace_semp_action.models
-        api_class: MsgVpnApi
-        config_class: Configuration
-        client_class: ApiClient
+
+    data_mappings:
+
+See [https://github.com/unixunion/py-solace-provision/blob/master/solace.yaml](https://github.com/unixunion/py-solace-provision/blob/master/solace.yaml) for a full example.
 
 If your version of the broker is greater than 9.3.0.0, it supports the SEMP `AllApi`, use that for `api_class` instead of 
 `MsgVpnApi` to get control of even more configurations.
