@@ -3,6 +3,7 @@ import logging
 import pickle
 from argparse import ArgumentParser
 from pathlib import Path
+import sp
 
 logger = logging.getLogger('solace-provision')
 logger.debug("imported")
@@ -15,6 +16,8 @@ class ArgParserCache:
     cache_file_name = None
 
     data_from_parser = {}
+
+    version = sp.__version__
 
     def __init__(self, do_load=True, cache_file_name="%s/.pysolpro/pysolpro.cache" % Path.home()):
         """
@@ -47,7 +50,7 @@ class ArgParserCache:
         if self.loaded:
             return
 
-        data = {}
+        data = {"meta": {"version": self.version}}
 
         try:
             logger.info("saving cache to disk")
@@ -90,19 +93,27 @@ class ArgParserCache:
         """
 
         for subcommand in self.cache:
-            logger.debug("sc: %s" % subcommand)
-            subc = subparser.add_parser(subcommand).add_subparsers()
+            if subcommand == "meta":
+                if self.cache[subcommand]["version"] == self.version:
+                    logger.debug("apc version check: ok")
+                else:
+                    logger.warning("argparse cache is from different version, please delete ~/.pysolpro/pysolpro.cache")
+                logger.info("ignoring meta: %s" % subcommand)
+            else:
+                logger.debug("sc: %s" % subcommand)
+                subc = subparser.add_parser(subcommand).add_subparsers()
 
-            for cmd in self.cache[subcommand]:
-                logger.debug(cmd)
-                tmp_group = subc.add_parser(cmd)
-                # todo fixme only supports single argument name, not the list of long --name and short -n
-                for param in self.cache[subcommand][cmd]:
-                    if param[0] != "-h":
-                        t = param
-                        opt = "%s" % t[0]
-                        help = t[2]
-                        y = tmp_group.add_argument(opt, action="store", type=str, help=help)
+                for cmd in self.cache[subcommand]:
+
+                    logger.debug(cmd)
+                    tmp_group = subc.add_parser(cmd)
+                    # todo fixme only supports single argument name, not the list of long --name and short -n
+                    for param in self.cache[subcommand][cmd]:
+                        if param[0] != "-h":
+                            t = param
+                            opt = "%s" % t[0]
+                            help = t[2]
+                            y = tmp_group.add_argument(opt, action="store", type=str, help=help)
 
         return subparser
 

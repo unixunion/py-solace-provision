@@ -66,7 +66,7 @@ def get_client(subcommand=None, config_class=None, client_class=None, **kwargs):
         elif k == "password":
             config.password = kwargs[k]
         else:
-            logger.error("unknown kwarg: %s" % k)
+            logger.debug("unknown kwarg: %s" % k)
 
     config.host = "%s%s" % (config.host, settings.commands[subcommand]["api_path"])
 
