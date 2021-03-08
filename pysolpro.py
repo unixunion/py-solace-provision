@@ -118,12 +118,13 @@ if __name__ == '__main__':
                                      **kw)
 
             subp = subparsers.add_parser(cmd).add_subparsers()
-            AutoApi.auto_sub_command_arg_parser(subparsers=subp,
-                                                models=a["models"],
-                                                apiclass=a["api"],
-                                                callback=a["api"](api_client=a["api_client"]))
+
 
             if a:
+                AutoApi.auto_sub_command_arg_parser(subparsers=subp,
+                                                    models=a["models"],
+                                                    apiclass=a["api"],
+                                                    callback=a["api"](api_client=a["api_client"]))
                 klasses.append(a)
 
 
