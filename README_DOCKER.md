@@ -12,8 +12,7 @@ followed by the SEMP API version for that version. e.g:
 
 ## Config File
 
-The config file is rather straight forward. Here is an example for a local solace broker with all three
-API's exposed.
+The config file is rather straight forward. Example for `config` API.
 
     ---
     solace_config:
@@ -35,6 +34,7 @@ API's exposed.
         client_class: ApiClient
 
     data_mappings:
+        ...
 
 See [https://github.com/unixunion/py-solace-provision/blob/master/solace.yaml](https://github.com/unixunion/py-solace-provision/blob/master/solace.yaml) for a full example.
 
@@ -46,14 +46,23 @@ If your version of the broker is greater than 9.3.0.0, it supports the SEMP `All
 
 The yaml config needs to be mounted at a specific location inside the container.
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 config --help
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 config create_msg_vpn --help
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 \
+        config get_msg_vpns
+
+It is also possible to override some values from the config
+
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
+        unixunion/pysolpro:0.2.8-9.8.0.12 \
+        --host http://otherurl \
+        --username readonly \
+        --password somepassword \
         config get_msg_vpns
 
 
@@ -62,7 +71,7 @@ The yaml config needs to be mounted at a specific location inside the container.
 Every solace managed object can be provisioned and updated from YAML data. The yaml data should be mounted into the 
 container. e.g:
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         -v `pwd`/data:/data  unixunion/pysolpro:0.2.8-9.8.0.12 \
         config create_msg_vpn --body /data/vpn.yaml
 
@@ -71,7 +80,7 @@ container. e.g:
 In order to create YAML [data](https://github.com/unixunion/py-solace-provision/tree/master/tests/testdata) files, simply 
 query the appliance for the data. Note that some properties cannot be queried, such as credentials, and certificates.
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         -v `pwd`/data:/data  unixunion/pysolpro:0.2.8-9.8.0.12 \
         config get_msg_vpn --msg_vpn_name default
 
@@ -85,7 +94,7 @@ more information about what fields should be present.
 The option `--save` and `--save-dir` allow retrieved objects to write out to the savedir location. 
 
     docker run -v `pwd`/output:/savedata \
-        -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+        -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 \
             --save 
             --save-dir /savedata \
@@ -147,11 +156,12 @@ Create a config file using above
     ---
     solace_config:
       config:
-        host: http://172.17.0.1/SEMP/v2/config
+        host: http://172.17.0.1
         username: admin
         password: admin
     commands:
       config:
+        api_path: /SEMP/v2/config
         module: solace_semp_config
         models: solace_semp_config.models
         api_class: AllApi
@@ -162,21 +172,21 @@ Create a config file using above
 
 Run PySolPro
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 \
         config get_msg_vpn \
             --msg_vpn_name default
 
 Provision a Queue using a YAML file
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         -v `pwd`/data:/data  unixunion/pysolpro:0.2.8-9.8.0.12 \
         config create_msg_vpn_queue \
             --msg_vpn_name default --body /data/queue.yaml
 
 Change the queue egress enabled state
 
-    docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
         -v `pwd`/data:/data unixunion/pysolpro:0.2.8-9.8.0.12 \
         config update_msg_vpn_queue \
             --msg_vpn_name default \
