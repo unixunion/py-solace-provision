@@ -32,7 +32,7 @@ The config file is rather straight forward. Example for `config` API.
         api_class: MsgVpnApi
         config_class: Configuration
         client_class: ApiClient
-
+    
     data_mappings:
         ...
 
@@ -44,16 +44,22 @@ If your version of the broker is greater than 9.3.0.0, it supports the SEMP `All
 
 ## Running
 
-The yaml config needs to be mounted at a specific location inside the container.
+The yaml config needs to be mounted at a specific location inside the container. Some usage examples:
 
     docker run -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 config --help
-
+    
     docker run -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 config create_msg_vpn --help
-
+    
     docker run -v `pwd`/solace.yaml:/solace.yaml \
         unixunion/pysolpro:0.2.8-9.8.0.12 \
+        config get_msg_vpns
+        
+    docker run -v `pwd`/solace.yaml:/solace.yaml \
+    		-v `pwd`/savedata:/savedata \
+        unixunion/pysolpro:0.2.8-9.8.0.12 \
+        --save --save-dir /savedata \
         config get_msg_vpns
 
 It is also possible to override some values from the config
@@ -81,7 +87,8 @@ In order to create YAML [data](https://github.com/unixunion/py-solace-provision/
 query the appliance for the data. Note that some properties cannot be queried, such as credentials, and certificates.
 
     docker run -v `pwd`/solace.yaml:/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:0.2.8-9.8.0.12 \
+        -v `pwd`/data:/data \
+        unixunion/pysolpro:0.2.8-9.8.0.12 \
         config get_msg_vpn --msg_vpn_name default
 
 The output from the above can be saved to file, and used as body payload for CRUD operations. See Saving Yaml below.
