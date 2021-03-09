@@ -8,7 +8,7 @@ For source, see https://github.com/unixunion/py-solace-provision
 Different versions are provided to different appliance SEMP versions. The version of the container is the pysolpro version, 
 followed by the SEMP API version for that version. e.g:
 
-    0.2.6-9.8.0.12 -> pysolpro 0.2.6, for SEMP version 9.8.0.12
+    0.2.8-9.8.0.12 -> pysolpro 0.2.8, for SEMP version 9.8.0.12
 
 ## Config File
 
@@ -47,13 +47,13 @@ If your version of the broker is greater than 9.3.0.0, it supports the SEMP `All
 The yaml config needs to be mounted at a specific location inside the container.
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:0.2.6-9.8.0.12 config --help
+        unixunion/pysolpro:0.2.8-9.8.0.12 config --help
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:0.2.6-9.8.0.12 config create_msg_vpn --help
+        unixunion/pysolpro:0.2.8-9.8.0.12 config create_msg_vpn --help
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:0.2.6-9.8.0.12 \
+        unixunion/pysolpro:0.2.8-9.8.0.12 \
         config get_msg_vpns
 
 
@@ -63,7 +63,7 @@ Every solace managed object can be provisioned and updated from YAML data. The y
 container. e.g:
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:0.2.6-9.8.0.12 \
+        -v `pwd`/data:/data  unixunion/pysolpro:0.2.8-9.8.0.12 \
         config create_msg_vpn --body /data/vpn.yaml
 
 ### Yaml Examples
@@ -72,7 +72,7 @@ In order to create YAML [data](https://github.com/unixunion/py-solace-provision/
 query the appliance for the data. Note that some properties cannot be queried, such as credentials, and certificates.
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:0.2.6-9.8.0.12 \
+        -v `pwd`/data:/data  unixunion/pysolpro:0.2.8-9.8.0.12 \
         config get_msg_vpn --msg_vpn_name default
 
 The output from the above can be saved to file, and used as body payload for CRUD operations. See Saving Yaml below.
@@ -86,7 +86,7 @@ The option `--save` and `--save-dir` allow retrieved objects to write out to the
 
     docker run -v `pwd`/output:/savedata \
         -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:0.2.6-9.8.0.12 \
+        unixunion/pysolpro:0.2.8-9.8.0.12 \
             --save 
             --save-dir /savedata \
             config get_msg_vpn --msg_vpn_name default 
@@ -163,21 +163,21 @@ Create a config file using above
 Run PySolPro
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        unixunion/pysolpro:0.2.6-9.8.0.12 \
+        unixunion/pysolpro:0.2.8-9.8.0.12 \
         config get_msg_vpn \
             --msg_vpn_name default
 
 Provision a Queue using a YAML file
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data  unixunion/pysolpro:0.2.6-9.8.0.12 \
+        -v `pwd`/data:/data  unixunion/pysolpro:0.2.8-9.8.0.12 \
         config create_msg_vpn_queue \
             --msg_vpn_name default --body /data/queue.yaml
 
 Change the queue egress enabled state
 
     docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml \
-        -v `pwd`/data:/data unixunion/pysolpro:0.2.6-9.8.0.12 \
+        -v `pwd`/data:/data unixunion/pysolpro:0.2.8-9.8.0.12 \
         config update_msg_vpn_queue \
             --msg_vpn_name default \
             --queue_name test \
