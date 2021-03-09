@@ -79,12 +79,9 @@ if __name__ == '__main__':
     # the argparse cache
     try:
         import argcomplete
-
         apc = ArgParserCache()
-        subparsers = apc.create_subparsers_from_cache(subparsers)
-        argcomplete.autocomplete(parser)
     except Exception as e:
-        logger.warning("auto complete not installed, tab completion disabled")
+        logger.warning("argcomplete not installed, tab completion disabled")
     finally:
 
         logger.info("initializing all modules")
@@ -111,6 +108,11 @@ if __name__ == '__main__':
 
         # we moved the subparser init here bcause of argparse issue 45  https://code.google.com/archive/p/argparse/issues/45
         subparsers = parser.add_subparsers(help='sub-command help')
+        try:
+            subparsers = apc.create_subparsers_from_cache(subparsers)
+            argcomplete.autocomplete(parser)
+        except Exception as e:
+            logger.warning("arg completion cache not initialized")
         logger.info("kwargs: %s" % kw)
 
         klasses = []

@@ -21,12 +21,13 @@ API's exposed.
         verify_ssl: false
         cert: certs/cert.pem
       config:
-        host: http://172.17.0.1:8080/SEMP/v2/config
+        host: http://172.17.0.1:8080
         username: admin
         password: admin
     
     commands:
       config:
+        api_path: /SEMP/v2/config
         module: solace_semp_config
         models: solace_semp_config.models
         api_class: MsgVpnApi
