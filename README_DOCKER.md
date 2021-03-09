@@ -1,6 +1,6 @@
-# pysolpro
+# pySolPro
 
-python-solace-provision, or pysolpro for short, is a commandline tool which is generated from Solace SEMPv2 APIs. 
+pySolPro is a commandline tool which is generated from Solace SEMPv2 APIs. 
 It provides CRUD operations for solace managed objects using YAML files as the underlying data layer.
 
 For source, see https://github.com/unixunion/py-solace-provision
