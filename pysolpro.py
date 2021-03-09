@@ -64,7 +64,7 @@ def arbitrary_data_callback(*args, **kwargs):
 if __name__ == '__main__':
     client_resolver = get_client
 
-    parser = argparse.ArgumentParser(prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
+    parser = argparse.ArgumentParser(exit_on_error=False, prog='pySolPro', formatter_class=PreserveWhiteSpaceWrapRawTextHelpFormatter)
     parser.add_argument("--save", dest="save", action='store_true', default=False, help="save retrieved data to disk")
     parser.add_argument("--save-dir", dest="savedir", action="store", default="savedata", help="location to save to")
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     parser.add_argument("--username", dest="username", action="store", help="username override")
     parser.add_argument("--password", dest="password", action="store", help="password override")
 
-    subparsers = parser.add_subparsers(help='sub-command help')
+
 
     # if tab-completion, use this
     # the argparse cache
@@ -100,11 +100,18 @@ if __name__ == '__main__':
             AutoApi
         ]
 
+        kw = {}
         try:
             args, unknown = parser.parse_known_args()
             kw = make_kwargs_from_args(args)
-        except Exception as e:
-            logger.error(e)
+        except SystemExit as e:
+            pass
+        except argparse.ArgumentError as e:
+            pass
+
+        # we moved the subparser init here bcause of argparse issue 45  https://code.google.com/archive/p/argparse/issues/45
+        subparsers = parser.add_subparsers(help='sub-command help')
+        logger.info("kwargs: %s" % kw)
 
         klasses = []
         for cmd in settings.commands:
