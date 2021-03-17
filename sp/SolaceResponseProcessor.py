@@ -3,6 +3,7 @@ import logging
 import yaml
 
 from sp.util import to_good_dict
+import sp
 
 logger = logging.getLogger('solace-provision')
 
@@ -11,9 +12,11 @@ logger = logging.getLogger('solace-provision')
 class SolaceResponseProcessor:
     # a place to call with data payloads for example when you want to save to disk
     data_callback = None
+    args = None
 
-    def __init__(self, data_callback=None):
+    def __init__(self, data_callback=None, args=None):
         self.data_callback = data_callback
+        self.args = args
 
     def __call__(self, *args, **kwargs):
         for arg in args:
@@ -39,12 +42,22 @@ class SolaceResponseProcessor:
                     data_list.append(y)
                 if self.data_callback:
                     logger.debug("calling data_callback")
+                    try:
+                        # try to update completion cache
+                        sp.apc.update_choices(data_list, self.args, *args, **kwargs)
+                    except Exception as e:
+                        pass
                     self.data_callback(data_list, *args, **kwargs)
             else:
                 logger.debug("single response")
                 y = yaml.dump(to_good_dict(data.data))
                 logger.info("response data\n%s" % y)
                 if self.data_callback:
+                    try:
+                        # try to update completion cache
+                        sp.apc.update_choices(y, self.args, *args, **kwargs)
+                    except Exception as e:
+                        pass
                     self.data_callback(y, *args, **kwargs)
 
         if hasattr(data, "meta"):

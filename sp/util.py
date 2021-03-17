@@ -231,6 +231,7 @@ def get_type_param_from_doc_strings(method, parameterName):
             return None
 
 
+# gets all the types from the parameters in the docstrings
 def get_type_params_from_doc_strings(method):
     if hasattr(method, "__doc__"):
         try:

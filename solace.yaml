@@ -94,6 +94,12 @@ data_mappings:
   MsgVpnSequencedTopic: hashfile
   MsgVpnTopicEndpoint: topicEndpointName
   MsgVpnTopicEndpointTemplate: topicEndpointTemplateName
+  # new for the auto choice cache
+  MsgVpnsResponse: msg_vpn_name
+  # new todo fixme
+#  MsgVpnsResponse:
+#    field: msg_vpn_name
+#    for: msg_vpn_name
 
 
 # used for when running PySolPro server

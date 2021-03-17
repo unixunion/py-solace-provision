@@ -5,6 +5,8 @@ from pathlib import Path
 
 from libksettings import KSettings
 
+from sp.ArgParseCache import ArgParserCache
+
 logger = logging.getLogger("pysolpro")
 
 __version__ = "0.2.9"
@@ -134,3 +136,9 @@ except Exception as e:
 solace_semp_unavailable_error = "\nUnable to import solace_semp_config, try:\n\n\tpip install " \
                                 "solace_semp_config==SOLACE_VERSION\n\nSee " \
                                 "https://pypi.org/project/solace-semp-config/#history for available versions\n\n "
+
+try:
+    import argcomplete
+    apc = ArgParserCache()
+except Exception as e:
+    logger.warning("argcomplete not installed, tab completion disabled")

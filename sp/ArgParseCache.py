@@ -1,11 +1,12 @@
 import argparse
 import logging
 import pickle
+import re
 from argparse import ArgumentParser
 from pathlib import Path
-import sp
 
-logger = logging.getLogger('solace-provision')
+
+logger = logging.getLogger('pysolpro')
 logger.debug("imported")
 
 
@@ -17,7 +18,7 @@ class ArgParserCache:
 
     data_from_parser = {}
 
-    version = sp.__version__
+    version = '0.2.9'
 
     def __init__(self, do_load=True, cache_file_name="%s/.pysolpro/pysolpro.cache" % Path.home()):
         """
@@ -50,7 +51,8 @@ class ArgParserCache:
         if self.loaded:
             return
 
-        data = {"meta": {"version": self.version}}
+        # the meta, and choices is initialized
+        data = {"meta": {"version": self.version}, "choices_db": {}}
 
         try:
             logger.info("saving cache to disk")
@@ -65,24 +67,35 @@ class ArgParserCache:
                             if not isinstance(spa, argparse._HelpAction):
                                 choices = spa.choices
                                 for choice in choices:
-                                    logger.debug(choice)
+                                    logger.debug("method: %s" % choice)
                                     data[subcommand][choice] = []
                                     for opt in choices[choice]._actions:
                                         if opt.option_strings[0] != "-h":
-                                            data[subcommand][choice].append((opt.option_strings[0], opt.dest, opt.help, 'str'))
+                                            data[subcommand][choice].append(
+                                                (opt.option_strings[0], opt.dest, opt.help, 'str'))
 
-                    self.data_from_parser = data
-                    try:
-                        with open(self.cache_file_name, mode="wb") as f:
-                            pickle.dump(data, f)
-                            f.close()
-                    except Exception as e:
-                        logger.warning("unable to initialize cache file: %s" % e)
+                    # self.data_from_parser = data
+                    self.cache = data
+                    self.save()
+                    # try:
+                    #     with open(self.cache_file_name, mode="wb") as f:
+                    #         pickle.dump(data, f)
+                    #         f.close()
+                    # except Exception as e:
+                    #     logger.warning("unable to initialize cache file: %s" % e)
 
 
         except Exception as e:
             logger.error("error: %s" % e)
             raise
+
+    def save(self):
+        try:
+            with open(self.cache_file_name, mode="wb") as f:
+                pickle.dump(self.cache, f)
+                f.close()
+        except Exception as e:
+            logger.warning("unable to initialize cache file: %s" % e)
 
     def create_subparsers_from_cache(self, subparser):
         """
@@ -99,22 +112,26 @@ class ArgParserCache:
                 else:
                     logger.warning("argparse cache is from different version, please delete ~/.pysolpro/pysolpro.cache")
                 logger.info("ignoring meta: %s" % subcommand)
+            elif subcommand == "choices_db":
+                logger.debug("loading choices_db")
+
             else:
-                logger.debug("sc: %s" % subcommand)
+                logger.debug("subcommand: %s" % subcommand)
                 subc = subparser.add_parser(subcommand).add_subparsers()
 
                 for cmd in self.cache[subcommand]:
-
-                    logger.debug(cmd)
+                    logger.debug("method: %s" % cmd)
                     tmp_group = subc.add_parser(cmd)
                     # todo fixme only supports single argument name, not the list of long --name and short -n
                     for param in self.cache[subcommand][cmd]:
                         if param[0] != "-h":
                             t = param
+                            logger.info("param: %s" % t[0])
                             opt = "%s" % t[0]
                             help = t[2]
-                            y = tmp_group.add_argument(opt, action="store", type=str, help=help)
+                            y = tmp_group.add_argument(opt, action="store", type=str, help=help, choices=self.make_choices(t[1]))
 
+        logger.debug(self.cache)
         return subparser
 
     def get_data_from_parser(self):
@@ -122,3 +139,59 @@ class ArgParserCache:
 
     def is_loaded(self):
         return self.loaded
+
+    def make_choices(self, method):
+        logger.info("make_choices: %s" % method)
+        if method in self.cache["choices_db"]:
+            return self.cache["choices_db"][method]
+        else:
+            logger.debug("default")
+            return ["__incomplete__"]
+
+    def update_choices(self, x, t, *y, **kwargs):
+        logger.debug("called with: %s" % x)
+        logger.debug(t.func.get_target())
+
+        logger.info(y)
+        # z = t.func.get_target()
+        method_name = t.func.get_target().__name__
+        logger.info("method_name: %s" % method_name)
+
+        return_type = self.get_return_type_for_method_docs_strings(t.func.get_target())
+        logger.info(return_type)
+
+        import sp
+        object_name_mappings = sp.settings.data_mappings
+        try:
+            name_field = object_name_mappings[return_type]
+            logger.debug("name field: %s" % name_field)
+            if isinstance(y[0].data, list):
+                for i in y[0].data:
+                    self.append_choices(name_field, getattr(i, name_field))
+            else:
+                self.append_choices(name_field, getattr(y[0].data, name_field))
+            logger.debug(self.cache["choices_db"])
+            self.save()
+        except Exception as e:
+            logger.error(e)
+            logger.warning("unable to update choices cache, no mapping for %s, please add a mapping to yaml config "
+                           "for which field names this object, e.g: MsgVpnsResponse: msgVpnName" % return_type)
+        # logger.info(y)
+        # logger.info(kwargs)
+
+    def append_choices(self, method, choice):
+        if method in self.cache["choices_db"]:
+            logger.debug("updating")
+            self.cache["choices_db"][method].append(choice)
+        else:
+            self.cache["choices_db"][method] = [choice]
+
+    # gets all the types from the parameters in the docstrings
+    def get_return_type_for_method_docs_strings(self, method):
+        if hasattr(method, "__doc__"):
+            try:
+                type_name = re.search(':return: (\w+?)\n', method.__doc__)
+                logger.debug(type_name)
+                return type_name.group(1)
+            except Exception as e:
+                return None
