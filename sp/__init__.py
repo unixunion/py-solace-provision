@@ -7,12 +7,12 @@ from libksettings import KSettings
 
 logger = logging.getLogger("pysolpro")
 
-__version__ = "0.2.8"
+__version__ = "0.2.9"
 
 example_config = """---
 solace_config:
   ssl:
-    verify_ssl: True
+    verify_ssl: False
     cert: certs/cert.pem
     
   config:

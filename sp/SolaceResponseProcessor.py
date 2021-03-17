@@ -49,4 +49,5 @@ class SolaceResponseProcessor:
 
         if hasattr(data, "meta"):
             logger.debug("meta is present")
-            logger.info("response_code: %s" % data.meta.response_code)
+            if data.meta.response_code != 200:
+                logger.info("response_code: %s" % data.meta.response_code)

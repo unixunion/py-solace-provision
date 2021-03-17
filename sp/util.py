@@ -2,11 +2,14 @@ import argparse
 import logging
 import re
 import textwrap
+from typing import Callable
+import inspect
 
 import six
 import yaml
 
 import sp
+
 settings = sp.settings
 
 logger = logging.getLogger('solace-provision')
@@ -69,7 +72,11 @@ def get_client(subcommand=None, config_class=None, client_class=None, **kwargs):
         else:
             logger.debug("unknown kwarg: %s" % k)
 
-    config.host = "%s%s" % (config.host, settings.commands[subcommand]["api_path"])
+    try:
+        config.host = "%s%s" % (config.host, settings.commands[subcommand]["api_path"])
+    except KeyError as e:
+        logger.warning("configuration error")
+        logger.warning(sp.example_config)
 
     client = client_class(configuration=config)
 
@@ -234,7 +241,7 @@ def get_type_params_from_doc_strings(method):
             return []
 
 
-def get_return_type_for_method_docs_trings(method):
+def get_return_type_for_method_docs_strings(method):
     if hasattr(method, "__doc__"):
         try:
             type_name = re.search(':return: (\w+?)\n', method.__doc__)
@@ -246,3 +253,48 @@ def get_return_type_for_method_docs_trings(method):
 
 def str2bool(v):
     return v.lower() in "true"
+
+
+def get_methods_in_api(apiclass):
+    object_methods = [method_name for method_name in dir(apiclass)
+                      if callable(getattr(apiclass, method_name)) and not method_name.startswith(
+            "__") and not method_name.endswith("with_http_info")]
+    logger.debug("got methods: %s" % object_methods)
+    return object_methods
+
+
+def get_methods_args(method: Callable):
+    if callable(method):
+        try:
+            sig = inspect.signature(method)
+
+            params = []
+            # for each parameter, check its type, and add to the subparsers as needed
+            for param in sig.parameters.values():
+                if param.name != "self" and param.name != "kwargs":
+                    params.append(param)
+
+            return params
+        except Exception as e:
+            raise ("Unable to get method args for method: %s" % method)
+    else:
+        raise ("Method %s is not callable" % method)
+
+
+def get_method_arg_and_type(method: Callable):
+    if callable(method):
+        ret = []
+        args = get_methods_args(method)
+        arg_types = get_type_params_from_doc_strings(method)
+        for arg in args:
+            logger.debug("checking arg: %s" % arg)
+            for tpl in arg_types:
+                logger.debug("checking tpl: %s %s" % tpl)
+                logger.debug("'%s' == '%s'" % (tpl[1], arg.name))
+                logger.debug("%s == %s" % (type(tpl[1]), type(arg.name)))
+                if tpl[1] == arg.name:
+                    logger.debug("appending")
+                    ret.append(tpl)
+        return ret
+    else:
+        raise ("Method %s is not callable" % method)

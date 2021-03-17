@@ -12,7 +12,7 @@ import yaml
 import sp
 settings = sp.settings
 
-from sp.util import get_type_param_from_doc_strings, get_return_type_for_method_docs_trings
+from sp.util import get_type_param_from_doc_strings, get_return_type_for_method_docs_strings
 
 logger = logging.getLogger('solace-provision')
 
@@ -58,7 +58,7 @@ class DataPersist:
                 except Exception as e:
                     pass
 
-            return_type = get_return_type_for_method_docs_trings(method)
+            return_type = get_return_type_for_method_docs_strings(method)
             return_type_class = getattr(importlib.import_module(models), return_type)
             return_data_type = return_type_class.swagger_types['data']
 

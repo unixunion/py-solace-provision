@@ -3,7 +3,7 @@ import logging
 
 from sp.ArgParseCache import ArgParserCache
 from sp.CallProxy import CallProxy
-from sp.util import get_type_param_from_doc_strings, is_primitive, get_type_params_from_doc_strings
+from sp.util import get_type_param_from_doc_strings, is_primitive, get_type_params_from_doc_strings, get_methods_in_api
 
 logger = logging.getLogger('solace-provision')
 
@@ -69,10 +69,11 @@ class AutoApi(object):
     def auto_sub_command_arg_parser(subparsers=None, models=None, apiclass=None, callback=None):
 
         logger.debug("cache is not loaded, getting methods")
-        object_methods = [method_name for method_name in dir(apiclass)
-                          if callable(getattr(apiclass, method_name)) and not method_name.startswith(
-                "__") and not method_name.endswith("with_http_info")]
-        logger.debug("got methods: %s" % object_methods)
+        object_methods = get_methods_in_api(apiclass)
+        # object_methods = [method_name for method_name in dir(apiclass)
+        #                   if callable(getattr(apiclass, method_name)) and not method_name.startswith(
+        #         "__") and not method_name.endswith("with_http_info")]
+        # logger.debug("got methods: %s" % object_methods)
 
         # holder for groups
         groups = []
