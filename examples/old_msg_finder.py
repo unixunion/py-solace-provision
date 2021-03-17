@@ -9,7 +9,10 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
     description='''This python script scans through downloaded monitor API data for old message id's
     In order to run this, first...
         pysolpro.py --save --save-dir configdata config get_msg_vpns
-        ls configdata/None/MsgVpn | xargs -I@ | sed 's/'.yaml//g | xargs -I@  echo pysolpro.py monitor get_msg_vpn_queues --msg_vpn_name @")''')
+        ls configdata/None/MsgVpn | xargs -I@ | sed 's/'.yaml//g | xargs -I@  echo pysolpro.py --save --save-dir /path/to/save/monitordata monitor get_msg_vpn_queues --msg_vpn_name @")
+     Then you can run this script
+        ./old_msg_finder --dir /path/to/save/monitordata
+                                 ''')
 parser.add_argument("--dir", action="store", required=True, dest="dir")
 parser.add_argument("--threshold", action="store", default=100000, dest="threshold")
 parser.add_argument("--debug", default=False, action="store_true")
