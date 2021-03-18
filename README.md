@@ -1,14 +1,16 @@
 # py-solace-provision
 
-An automated self-generating command-line tool for Solace appliances. This tool scans the imported `solace_semp_api` and 
-renders the Api into a command-line tool with some basic ability to create, update and delete Solace managed objects.
+An dynamically generated command-line tool for interacting with Solace appliances. This tool scans the imported `solace_semp_api` 
+to form a command-line tool which can create, update and delete Solace managed objects.
 
-Example:
+Examples:
 
 ```bash
 pysolpro.py [config|monitor|action] --help  
 
 pysolpro.py config create_msg_vpn --body data/vpn.yaml
+
+pysolpro.py --save config get_msg_vpns
 
 pysolpro.py action do_msg_vpn_clear_stats --msg_vpn_name default --body data/empty.yaml
 
@@ -20,12 +22,12 @@ pysolpro.py config update_msg_vpn \
 
 pysolpro.py action get_msg_vpns --where enabled==false
 
-pysolpro.py config get_msg_vpn_queues --msg_vpn_name default 2>&1 | grep queueName
+pysolpro.py config get_msg_vpn_queues --msg_vpn_name default --where "msgSpoolUsage>1000000"
 ```
 
 ## Status
 
-Most commands work with some limitations. 
+Working with some minor limitations. 
 
 1. `--where` only supports ONE where parameter, due to solace OpenAPI spec being v2, and the API not accepting %2C encoded 
    comma. If Solace moves to OpenAPIv3, there is a `allowReserved` setting to prevent encoding of reserved characters.
@@ -37,7 +39,8 @@ Most commands work with some limitations.
 
 ## Dependencies
 
-pySolPro imports one or several libraries available at runtime, [solace-semp-config](https://pypi.org/project/solace-semp-config/#description) library is required. The monitoring and action libraries are optional, and have a performance cost. So dont install monitor or action if you dont intend to use them. 
+pySolPro imports one or several libraries available at runtime, [solace-semp-config](https://pypi.org/project/solace-semp-config/#description) library is required. 
+The monitor and action libraries are optional, and have a performance cost. Only install monitor or action if you intend to use them. 
 
 ## Docker
 
@@ -45,7 +48,8 @@ Docker images are available at https://hub.docker.com/r/unixunion/pysolpro
 
 ## Installation
 
-pySolPro depends on getting the closest version of the [solace-semp-config](https://pypi.org/project/solace-semp-config/#description) library. Use the closest version equal or less than your broker version from the versions available. 
+pySolPro depends on getting the closest version of the [solace-semp-config](https://pypi.org/project/solace-semp-config/#description) library. 
+Use the closest version equal or less than your broker version from the versions available. 
 
 ### pip
 
@@ -69,11 +73,11 @@ pip install pygments
 
 ### manual
 
-Create a virtual environment for this
+Create a virtual environment, name them according to the broker version they will support to make things easier to understand.
 
 ```bash
-python3 -m venv ~/spvenv
-source ~/spvenv/bin/activate
+python3 -m venv ~/solace_9.8
+source ~/solace_9.8/bin/activate
 ```
 
 Install dependencies, where SOLACE_VERSION equals your broker version or closest match. 
@@ -81,7 +85,6 @@ see [https://pypi.org/project/solace-semp-config/](https://pypi.org/project/sola
 
 ```bash
 # required
-pip install -r requirements.txt
 pip install solace-semp-config==SOLACE_VERSION
 ```
 
@@ -97,16 +100,22 @@ Optional extras
 ```sh
 pip install argcomplete
 pip install coloredlogs
+pip install pygments
 ```
 
 Now you can run `pysolpro.py --help`
 
 ## Configuring API
 
-See [solace.yaml](solace.yaml) for how to set up broker credentials and API endpoint(s). pySolPro searches for a file named `solace.yaml` in several locations listed below, or you can pass the a config filename via an environment property, e.g:
+If no configuration is present, pysolpro.py will print out an example config for you. Copy and paste the contents into 
+a file named "solace.yaml"
+
+See [solace.yaml](solace.yaml) for how to set up broker credentials and API endpoint(s). pySolPro searches for a file 
+named `solace.yaml` in several locations listed below, or you can pass a config filename via an environment property, e.g:
 
 ```bash
-PYSOLPRO_CONFIG=/full/path/to/config.yaml pysolpro.py config get_msg_vpns
+export PYSOLPRO_CONFIG=/full/path/to/config.yaml 
+pysolpro.py config get_msg_vpns
 ```
 
 You can also pass a partial path via the environment variable, which will then search the below mentioned locations for that file.
@@ -115,7 +124,7 @@ You can also pass a partial path via the environment variable, which will then s
 PYSOLPRO_CONFIG=relevant/path/to/config.yaml pysolpro.py config get_msg_vpns
 ```
 
-If the above relevant config file is not immediately found in the current working directory, it is searched for in the following locations:
+If the above relevant config path is not resolving, the following locations are searched:
 
     ".",
     "~/.pysolpro/",
@@ -123,7 +132,10 @@ If the above relevant config file is not immediately found in the current workin
     "/opt/pysolpro",
     "/etc/pysolpro"
 
-The config file also denotes which API's pySolPro generates commands for. There are 3 API's available, `config`, `action` and `monitor`. `config` is required, and requires the `solace-semp-config` module. Both `action` and `monitor` are optional, and should not be installed if not using them, as it slows down the command parser.  
+The config file also denotes which API's pySolPro will load. There are 3 API's available, `config`, `action` 
+and `monitor`. At least `config` is required, and is fullfilled by installing the `solace-semp-config` module. Both 
+`action` and `monitor` are optional, and should not be installed if you never intend on using them, as it slows down the 
+command parser. 
 
 Configuring the API's example:
 
@@ -178,7 +190,9 @@ All solace managed objects can be represented as YAML files. see [data/](data/) 
 by querying the appliance for the relevant object. Note that some attributes are NOT retrieved from appliances during 
 GET operations. Some examples are items such as credentials. There is a task to create this feature using the `opaque_password` parameter.
 
-Solace Objects have a tendency to have incompatible attributes, and these should be removed from YAML before submitting to appliance. Examples of these are commented out in [data/](/data) files. For example, you cannot use clearPercent and clearValue at same time.
+Solace Objects have a tendency to have incompatible attributes, and these should be removed from YAML before submitting 
+to appliance. Examples of these are commented out in [data/](/data) files. For example, you cannot use clearPercent and 
+clearValue at same time.
 
     eventEgressFlowCountThreshold:
       clearPercent: 40
@@ -203,7 +217,9 @@ The response from the appliance will generally indicate if you have incompatible
             "status":"NOT_ALLOWED"
         },
 
-When using Object Files to create/update managed objects on the broker, you can use the `--override` argument to override any attribute in the YAML files before it is posted to the appliance. As an example, this can be used enable/disable services. It can also be used to "template" objects using the same yaml. e.g:
+When using Object Files to create/update managed objects on the broker, you can use the `--override` argument to override 
+any attribute in the YAML files before it is posted to the appliance. As an example, this can be used enable/disable 
+services. It can also be used to "template" objects using the same yaml. e.g:
 
 ```bash
 pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName myVpn
@@ -212,7 +228,8 @@ pysolpro.py config create_msg_vpn --body data/vpn.yaml --override msgVpnName ano
 
 ## Running pySolPro
 
-Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are labeled in the help as being `file: <ClassName>`. These must have their argument provide a path to a YAML file.
+Simply provide what the method's help requires, parameters are passed directly on command line, and some, like body, are 
+labeled in the help as being `file: <ClassName>`. These must have their argument provide a path to a YAML file.
 
     usage: pySolPro [-h] [--save] [--save-dir SAVEDIR] [--host HOST] [--username USERNAME] [--password PASSWORD] {config,monitor,action} ...
     
@@ -235,7 +252,7 @@ Simply provide what the method's help requires, parameters are passed directly o
 
 ##### --opaque_password
 
-Allows you to upload/download secrets from the appliance. You must be using TLS.
+Allows you to upload/download opaque secrets from the appliance. You must be using TLS.
 
 ##### --override
 
@@ -252,7 +269,8 @@ Multiple `--override` arguments can be provided.
 
 ##### --where
 
-When querying the appliance with get_* commands, the SEMP API can filter the response to only include objects where certain conditions evaluate to true.
+When querying the appliance with get_* commands, the SEMP API can filter the response to only include objects where certain 
+conditions evaluate to true.
 
 The value of where is a comma-separated list of expressions. All expressions must be true for the object to be included 
 in the response. Each expression takes the form:
@@ -263,7 +281,8 @@ OP          = '==' | '!=' | '&lt;' | '&gt;' | '&lt;=' | '&gt;='
 value may be a number, string, true, or false, as appropriate for the type of attribute-name. Greater-than and less-than 
 comparisons only work for numbers. A * in a string value is interpreted as a wildcard (zero or more characters).
 
-Note, only one where condition is supported at the moment, due to Solace not using OpenAPI3. OpenAPI2 does not have `allowReserved` keyword in the parameter specification, so the `,` separator is encoded to %2C.
+Note, only one where condition is supported at the moment, due to Solace not using OpenAPI3. OpenAPI2 does not have 
+`allowReserved` keyword in the parameter specification, so the `,` separator is encoded to %2C.
 
 Example:
 
