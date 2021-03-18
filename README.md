@@ -10,7 +10,7 @@ pysolpro.py [config|monitor|action] --help
 
 pysolpro.py config create_msg_vpn --body data/vpn.yaml
 
-pysolpro.py --save config get_msg_vpns
+pysolpro.py --save config get_msg_vpns --where enabled==true
 
 pysolpro.py action do_msg_vpn_clear_stats --msg_vpn_name default --body data/empty.yaml
 
@@ -19,8 +19,6 @@ pysolpro.py config update_msg_vpn \
     --body data/vpn.yaml \
     --override dmrEnabled false \
     --override enabled false
-
-pysolpro.py action get_msg_vpns --where enabled==false
 
 pysolpro.py config get_msg_vpn_queues --msg_vpn_name default --where "msgSpoolUsage>1000000"
 ```
