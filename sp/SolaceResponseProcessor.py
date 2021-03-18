@@ -4,10 +4,20 @@ import yaml
 
 from sp import shared
 from sp.util import to_good_dict
-import sp
+# import sp
 
 logger = logging.getLogger('solace-provision')
 
+pycolor = False
+
+try:
+    from pygments import highlight
+    from pygments.lexers import YamlLexer
+    from pygments.formatters import TerminalFormatter
+    pycolor = True
+except ImportError as e:
+    logger.warning("pygments not installed")
+    pass
 
 # this class handles the data types returned by solace
 class SolaceResponseProcessor:
@@ -39,7 +49,10 @@ class SolaceResponseProcessor:
                 data_list = []
                 for i in data.data:
                     y = yaml.dump(to_good_dict(i))
-                    logger.info("response data\n%s" % y)
+                    if pycolor:
+                        logger.info("response data\n%s" % highlight(y, YamlLexer(), TerminalFormatter()))
+                    else:
+                        logger.info("response data\n%s" % y)
                     data_list.append(y)
                 if self.data_callback:
                     logger.debug("calling data_callback")
@@ -53,7 +66,11 @@ class SolaceResponseProcessor:
             else:
                 logger.debug("single response")
                 y = yaml.dump(to_good_dict(data.data))
-                logger.info("response data\n%s" % y)
+                # logger.info("response data\n%s" % y)
+                if pycolor:
+                    logger.info("response data\n%s" % highlight(y, YamlLexer(), TerminalFormatter()))
+                else:
+                    logger.info("response data\n%s" % y)
                 if self.data_callback:
                     if shared.apc:
                         try:

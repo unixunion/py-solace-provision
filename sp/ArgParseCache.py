@@ -147,7 +147,7 @@ class ArgParserCache:
             return self.cache["choices_db"][method]
         else:
             logger.debug("default")
-            return ["__incomplete__"]
+            return []
 
     def update_choices(self, x, t, *y, **kwargs):
         logger.debug("called with: %s" % x)

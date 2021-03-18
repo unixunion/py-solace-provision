@@ -60,8 +60,11 @@ pip install solace-semp-config==9.8.0.12
 # optional
 pip install solace-semp-monitor==9.8.0.12
 pip install solace-semp-action==9.8.0.12
+# arg completion
 pip install argcomplete
+# colourized output
 pip install coloredlogs
+pip install pygments
 ```
 
 ### manual

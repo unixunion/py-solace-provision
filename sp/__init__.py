@@ -109,7 +109,7 @@ data_mappings:
   MsgVpnSequencedTopic: hashfile
   MsgVpnTopicEndpoint: topicEndpointName
   MsgVpnTopicEndpointTemplate: topicEndpointTemplateName
-  # new for the auto choice cache
+  # choices mappings, are the _ separated ones on the object classes
   MsgVpnsResponse: msg_vpn_name
   MsgVpnResponse: msg_vpn_name
   MsgVpnQueuesResponse: queue_name
