@@ -131,7 +131,7 @@ try:
     logger.debug("loading pysolpro settings...")
     settings = KSettings(config_filename="solace.yaml",
                          config_filename_envvar="PYSOLPRO_CONFIG",
-                         # cache_file_name="pysolpro.cache",
+                         cache_file_name="pysolpro.cache",
                          PLUGINS=[],
                          config_load_locations=[os.getcwd(), "%s/.pysolpro" % Path.home(), "/", "/opt/pysolpro", "/etc/pysolpro"],
                          load_yaml=True)

@@ -1,13 +1,12 @@
 
 import logging
 
-from sp.ArgParseCache import ArgParserCache
-
 logger = logging.getLogger("pysolpro")
 
 apc = None
 
 try:
+    from sp.ArgParseCache import ArgParserCache
     import argcomplete
     apc = ArgParserCache()
     logger.debug("argcompleter initialized")

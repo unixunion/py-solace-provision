@@ -13,7 +13,7 @@ def void():
 
 
 class TestArgParserCache(TestCase):
-    apc = ArgParserCache(do_load=False)
+    apc = ArgParserCache(do_load=False, cache_file_name="test.cache")
 
     def test_create_cache_from_parser(self):
         parser = argparse.ArgumentParser(prog='pySolPro')
@@ -29,13 +29,14 @@ class TestArgParserCache(TestCase):
         z.add_argument("--bar", action="store", help="bar help")
         z.add_argument("--baz", action="store", help="baz help")
         self.apc.create_cache_from_parser(parser)
-        assert isinstance(self.apc.get_data_from_parser(), dict)
-        assert self.apc.get_data_from_parser()["x"] == {
+        assert isinstance(self.apc.get_cache(), dict)
+        print(self.apc.get_cache)
+        assert self.apc.get_cache()["x"] == {
             'm': [('--foo', 'foo', 'foo help', 'str'), ('--bar', 'bar', 'bar help', 'str')]}
 
 
     def test_create_subparsers_from_cache(self):
-        self.apc = ArgParserCache(do_load=True)
+        self.apc = ArgParserCache(do_load=True, cache_file_name="test.cache")
         assert self.apc.loaded is True
         parser = argparse.ArgumentParser(prog='pySolPro')
         subparsers = parser.add_subparsers(help='sub-command help')
@@ -45,6 +46,6 @@ class TestArgParserCache(TestCase):
     def test_z_cleanup(self):
         import os
         try:
-            os.remove("%s/.pysolpro/pysolpro.cache" % Path.home())
+            os.remove("test.cache")
         except Exception as e:
             raise

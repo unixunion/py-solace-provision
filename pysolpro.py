@@ -2,6 +2,7 @@
 # PYTHON_ARGCOMPLETE_OK
 
 import logging
+import os
 import sys
 
 
@@ -10,13 +11,16 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
 logger = logging.getLogger("pysolpro")
 
-logger.setLevel(logging.INFO)
+if os.environ.get("PYSOLPRO_DEBUG"):
+    logger.setLevel(logging.DEBUG)
+else:
+    logger.setLevel(logging.INFO)
 
-try:
-    import coloredlogs
-    coloredlogs.install()
-except ImportError as e:
-    pass
+    try:
+        import coloredlogs
+        coloredlogs.install()
+    except ImportError as e:
+        pass
 
 # handler = logging.StreamHandler(sys.stdout)
 # handler.setLevel(logging.DEBUG)

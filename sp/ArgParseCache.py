@@ -74,7 +74,6 @@ class ArgParserCache:
                                             data[subcommand][choice].append(
                                                 (opt.option_strings[0], opt.dest, opt.help, 'str'))
 
-                    # self.data_from_parser = data
                     self.cache = data
                     self.save()
                     # try:
@@ -136,8 +135,8 @@ class ArgParserCache:
         logger.debug(self.cache)
         return subparser
 
-    def get_data_from_parser(self):
-        return self.data_from_parser
+    def get_cache(self):
+        return self.cache
 
     def is_loaded(self):
         return self.loaded
@@ -175,9 +174,10 @@ class ArgParserCache:
             logger.debug(self.cache["choices_db"])
             self.save()
         except Exception as e:
-            logger.error(e)
-            logger.debug("unable to update choices cache, no mapping for %s, please add a mapping to yaml config "
-                           "for which field names this object, e.g: MsgVpnsResponse: msgVpnName" % return_type)
+            # logger.error(e)
+            logger.warning("unable to update choices cache, no mapping for %s, please add a data_mapping to yaml "
+                           "config which identifies which field name this object should add to autocompletion "
+                           "choices, e.g: %s: some_field_name" % (return_type, return_type))
         # logger.info(y)
         # logger.info(kwargs)
 
