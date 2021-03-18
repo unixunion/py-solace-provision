@@ -49,14 +49,19 @@ pySolPro depends on getting the closest version of the [solace-semp-config](http
 
 ### pip
 
-Using pip, you can install pySolPro into your python environment.
+Using pip, you can install pySolPro into your python environment. The versions of solace-semp-* are the closest match
+available on pypi for your broker. see [pypi](https://pypi.org/user/unixunion/) for available versions.
 
 ```sh
+python3 -m venv ~/solace_9.8
+source ~/solace_9.8/bin/activate
 pip install py-solace-provision
-pip install solace-semp-config==SOLACE_VERSION
+pip install solace-semp-config==9.8.0.12
 # optional
-pip install solace-semp-monitor==SOLACE_VERSION
-pip install solace-semp-action==SOLACE_VERSION
+pip install solace-semp-monitor==9.8.0.12
+pip install solace-semp-action==9.8.0.12
+pip install argcomplete
+pip install coloredlogs
 ```
 
 ### manual
@@ -299,8 +304,22 @@ key in the data to use for the filename, or alternatively hash the payload for s
 ### Optional Extras
 #### Tab completion
 
-pySolPro supports tab completion, and will create a cache file named pysolpro.cache upon first invocation. 
-see [argcomplete](https://kislyuk.github.io/argcomplete/) for more info
+pySolPro supports tab completion, the first time you run pysolpro.py, it will create a cache file as configured in solace.yaml. 
+Specify a different `cache_file_name` for different brokers. At the moment tab-completion supports all arguments of the script, 
+and can also complete the VPN and QUEUE names. 
+
+As you use pysolpro, and request queues and vpns from the broker, they are added to the tab completion cache. So in order to
+fully populate the cache, you need to:
+
+    pysolpro.py
+    pysolpro.py config get_msg_vpns
+    # for each vpn:
+    pysolpro.py config get_msg_vpn_queues --msg_vpn_name ${vpn_name}
+
+NOTE, the queue-name completer will complete ALL queues, and does not know which queues are in which VPNS currently. 
+
+
+For installation, see [argcomplete](https://kislyuk.github.io/argcomplete/) for more info
 
     pip install argcomplete
 
@@ -314,9 +333,23 @@ For zsh:
     source ~/spvenv/bin/activate
     eval "$(register-python-argcomplete pysolpro.py)"
 
-To populate the cache, run the --help command:
+To populate the initial command cache, run the --help command:
 
-    ./pysolpro.py --help
+    ./pysolpro.py
+
+If you are using environment variables to specify the location of PYSOLPRO_CONFIG, you need to set PYSOLPRO_CONFIG before 
+the script is called. This is due to limitations in how argcomplete works. e.g:
+
+    # this will add all vpn names to cache_file_name specified in other.yaml
+    export PYSOLPRO_CONFIG=other.yaml
+    pysolpro.py config get_msg_vpns
+    # this should now be able to tab-complete msg-vpn names from the cache
+    pysolpro.py config get_msg_vpn_queues --msg-vpn TAB TAB
+    # after the above line, all queues will be added to the cache also. 
+
+and NOT
+
+    PYSOLPRO_CONFIG=/someconfig.yaml pysolpro.py 
 
 #### Colourized logs
 

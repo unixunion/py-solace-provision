@@ -1,4 +1,5 @@
 ---
+cache_file_name: localhost.cache
 solace_config:
   ssl:
     verify_ssl: True
@@ -96,11 +97,9 @@ data_mappings:
   MsgVpnTopicEndpointTemplate: topicEndpointTemplateName
   # new for the auto choice cache
   MsgVpnsResponse: msg_vpn_name
-  # new todo fixme
-#  MsgVpnsResponse:
-#    field: msg_vpn_name
-#    for: msg_vpn_name
-
+  MsgVpnResponse: msg_vpn_name
+  MsgVpnQueuesResponse: queue_name
+  MsgVpnQueueResponse: queue_name
 
 # used for when running PySolPro server
 SERVER:

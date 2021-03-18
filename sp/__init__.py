@@ -5,13 +5,14 @@ from pathlib import Path
 
 from libksettings import KSettings
 
-from sp.ArgParseCache import ArgParserCache
+# from sp.ArgParseCache import ArgParserCache
 
 logger = logging.getLogger("pysolpro")
 
-__version__ = "0.2.9"
+__version__ = "0.3.0"
 
-example_config = """---
+example_config = """
+cache_file_name: localhost.cache
 solace_config:
   ssl:
     verify_ssl: False
@@ -108,7 +109,12 @@ data_mappings:
   MsgVpnSequencedTopic: hashfile
   MsgVpnTopicEndpoint: topicEndpointName
   MsgVpnTopicEndpointTemplate: topicEndpointTemplateName
-
+  # new for the auto choice cache
+  MsgVpnsResponse: msg_vpn_name
+  MsgVpnResponse: msg_vpn_name
+  MsgVpnQueuesResponse: queue_name
+  MsgVpnQueueResponse: queue_name
+  
 # used for when running PySolPro server
 SERVER:
   host: 127.0.0.1
@@ -125,6 +131,7 @@ try:
     logger.debug("loading pysolpro settings...")
     settings = KSettings(config_filename="solace.yaml",
                          config_filename_envvar="PYSOLPRO_CONFIG",
+                         # cache_file_name="pysolpro.cache",
                          PLUGINS=[],
                          config_load_locations=[os.getcwd(), "%s/.pysolpro" % Path.home(), "/", "/opt/pysolpro", "/etc/pysolpro"],
                          load_yaml=True)
@@ -137,8 +144,8 @@ solace_semp_unavailable_error = "\nUnable to import solace_semp_config, try:\n\n
                                 "solace_semp_config==SOLACE_VERSION\n\nSee " \
                                 "https://pypi.org/project/solace-semp-config/#history for available versions\n\n "
 
-try:
-    import argcomplete
-    apc = ArgParserCache()
-except Exception as e:
-    logger.warning("argcomplete not installed, tab completion disabled")
+# try:
+#     import argcomplete
+#     apc = ArgParserCache()
+# except Exception as e:
+#     logger.warning("argcomplete not installed, tab completion disabled")

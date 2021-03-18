@@ -4,17 +4,19 @@
 import logging
 import sys
 
+
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s')
 logger = logging.getLogger("pysolpro")
 
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
-# try:
-#     import coloredlogs
-#     coloredlogs.install()
-# except ImportError as e:
-#     pass
+try:
+    import coloredlogs
+    coloredlogs.install()
+except ImportError as e:
+    pass
 
 # handler = logging.StreamHandler(sys.stdout)
 # handler.setLevel(logging.DEBUG)
@@ -32,12 +34,12 @@ logger.info("pysolpro: https://github.com/unixunion/py-solace-provision")
 import sp
 
 settings = sp.settings
+from sp import shared
 from sp.DataPersist import DataPersist
 from sp.SubCommandConfig import create_subcmd_config
 
 import argparse
 
-from sp.ArgParseCache import ArgParserCache
 from sp.SolaceResponseProcessor import SolaceResponseProcessor
 from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, get_client, generic_output_processor, \
     make_kwargs_from_args
@@ -46,7 +48,7 @@ from sp.util import PreserveWhiteSpaceWrapRawTextHelpFormatter, get_client, gene
 active_modules = []
 
 # argparse cache holder
-apc = None
+apc = shared.apc
 
 dp = DataPersist()
 
@@ -77,12 +79,12 @@ if __name__ == '__main__':
     # the argparse cache
     try:
         import argcomplete
-    #     apc = ArgParserCache()
+        apc = shared.apc
     except Exception as e:
         logger.warning("argcomplete not installed, tab completion disabled")
     finally:
 
-        logger.info("initializing all modules")
+        logger.debug("initializing all modules")
 
         # import this here because its slow, and we don't want to impede the autocompleter
         # from sp.AutoManageGenerator import AutoManageGenerator
@@ -107,11 +109,11 @@ if __name__ == '__main__':
         # we moved the subparser init here bcause of argparse issue 45  https://code.google.com/archive/p/argparse/issues/45
         subparsers = parser.add_subparsers(help='sub-command help')
         try:
-            subparsers = sp.apc.create_subparsers_from_cache(subparsers)
+            subparsers = shared.apc.create_subparsers_from_cache(subparsers)
             argcomplete.autocomplete(parser)
         except Exception as e:
             logger.warning("arg completion cache not initialized")
-        logger.info("kwargs: %s" % kw)
+        logger.debug("kwargs: %s" % kw)
 
         klasses = []
         for cmd in settings.commands:
@@ -135,8 +137,8 @@ if __name__ == '__main__':
 
         [active_modules.append(m(None, None)) for m in sp_modules]
         # maybe generate cache for argparse
-        if sp.apc:
-            sp.apc.create_cache_from_parser(parser)
+        if shared.apc:
+            shared.apc.create_cache_from_parser(parser)
 
         args = parser.parse_args()
         try:

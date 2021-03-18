@@ -2,6 +2,7 @@ import logging
 
 import yaml
 
+from sp import shared
 from sp.util import to_good_dict
 import sp
 
@@ -42,22 +43,24 @@ class SolaceResponseProcessor:
                     data_list.append(y)
                 if self.data_callback:
                     logger.debug("calling data_callback")
-                    try:
-                        # try to update completion cache
-                        sp.apc.update_choices(data_list, self.args, *args, **kwargs)
-                    except Exception as e:
-                        pass
+                    if shared.apc:
+                        try:
+                            # try to update completion cache
+                            shared.apc.update_choices(data_list, self.args, *args, **kwargs)
+                        except Exception as e:
+                            logger.error("unable to update choice completions")
                     self.data_callback(data_list, *args, **kwargs)
             else:
                 logger.debug("single response")
                 y = yaml.dump(to_good_dict(data.data))
                 logger.info("response data\n%s" % y)
                 if self.data_callback:
-                    try:
-                        # try to update completion cache
-                        sp.apc.update_choices(y, self.args, *args, **kwargs)
-                    except Exception as e:
-                        pass
+                    if shared.apc:
+                        try:
+                            # try to update completion cache
+                            shared.apc.update_choices(y, self.args, *args, **kwargs)
+                        except Exception as e:
+                            logger.error("unable to update choice completions")
                     self.data_callback(y, *args, **kwargs)
 
         if hasattr(data, "meta"):

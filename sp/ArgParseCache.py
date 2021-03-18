@@ -4,7 +4,7 @@ import pickle
 import re
 from argparse import ArgumentParser
 from pathlib import Path
-
+import sp
 
 logger = logging.getLogger('pysolpro')
 logger.debug("imported")
@@ -18,9 +18,9 @@ class ArgParserCache:
 
     data_from_parser = {}
 
-    version = '0.2.9'
+    version = '0.3.0'
 
-    def __init__(self, do_load=True, cache_file_name="%s/.pysolpro/pysolpro.cache" % Path.home()):
+    def __init__(self, do_load=True, cache_file_name="%s/.pysolpro/%s" % (Path.home(), sp.settings.cache_file_name)):
         """
         Instantiate a instance of the argparse cache, if it finds the cache_file on disk, it will load it.
 
@@ -91,6 +91,8 @@ class ArgParserCache:
 
     def save(self):
         try:
+            logger.debug("cache: %s" % self.cache)
+            logger.debug("saving to file: %s" % self.cache_file_name)
             with open(self.cache_file_name, mode="wb") as f:
                 pickle.dump(self.cache, f)
                 f.close()
@@ -111,7 +113,7 @@ class ArgParserCache:
                     logger.debug("apc version check: ok")
                 else:
                     logger.warning("argparse cache is from different version, please delete ~/.pysolpro/pysolpro.cache")
-                logger.info("ignoring meta: %s" % subcommand)
+                logger.debug("ignoring meta: %s" % subcommand)
             elif subcommand == "choices_db":
                 logger.debug("loading choices_db")
 
@@ -126,7 +128,7 @@ class ArgParserCache:
                     for param in self.cache[subcommand][cmd]:
                         if param[0] != "-h":
                             t = param
-                            logger.info("param: %s" % t[0])
+                            logger.debug("param: %s" % t[0])
                             opt = "%s" % t[0]
                             help = t[2]
                             y = tmp_group.add_argument(opt, action="store", type=str, help=help, choices=self.make_choices(t[1]))
@@ -141,7 +143,7 @@ class ArgParserCache:
         return self.loaded
 
     def make_choices(self, method):
-        logger.info("make_choices: %s" % method)
+        logger.debug("make_choices: %s" % method)
         if method in self.cache["choices_db"]:
             return self.cache["choices_db"][method]
         else:
@@ -152,13 +154,13 @@ class ArgParserCache:
         logger.debug("called with: %s" % x)
         logger.debug(t.func.get_target())
 
-        logger.info(y)
+        logger.debug(y)
         # z = t.func.get_target()
         method_name = t.func.get_target().__name__
-        logger.info("method_name: %s" % method_name)
+        logger.debug("method_name: %s" % method_name)
 
         return_type = self.get_return_type_for_method_docs_strings(t.func.get_target())
-        logger.info(return_type)
+        logger.debug(return_type)
 
         import sp
         object_name_mappings = sp.settings.data_mappings
@@ -174,15 +176,16 @@ class ArgParserCache:
             self.save()
         except Exception as e:
             logger.error(e)
-            logger.warning("unable to update choices cache, no mapping for %s, please add a mapping to yaml config "
+            logger.debug("unable to update choices cache, no mapping for %s, please add a mapping to yaml config "
                            "for which field names this object, e.g: MsgVpnsResponse: msgVpnName" % return_type)
         # logger.info(y)
         # logger.info(kwargs)
 
     def append_choices(self, method, choice):
         if method in self.cache["choices_db"]:
-            logger.debug("updating")
-            self.cache["choices_db"][method].append(choice)
+            if not choice in self.cache["choices_db"][method]:
+                logger.debug("updating")
+                self.cache["choices_db"][method].append(choice)
         else:
             self.cache["choices_db"][method] = [choice]
 
