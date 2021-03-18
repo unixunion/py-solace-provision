@@ -13,7 +13,7 @@ pycolor = False
 try:
     from pygments import highlight
     from pygments.lexers import YamlLexer
-    from pygments.formatters import TerminalFormatter
+    from pygments.formatters import Terminal256Formatter
     pycolor = True
 except ImportError as e:
     logger.warning("pygments not installed")
@@ -50,7 +50,7 @@ class SolaceResponseProcessor:
                 for i in data.data:
                     y = yaml.dump(to_good_dict(i))
                     if pycolor:
-                        logger.info("response data\n%s" % highlight(y, YamlLexer(), TerminalFormatter()))
+                        logger.info("response data\n%s" % highlight(y, YamlLexer(), Terminal256Formatter()))
                     else:
                         logger.info("response data\n%s" % y)
                     data_list.append(y)
@@ -68,7 +68,7 @@ class SolaceResponseProcessor:
                 y = yaml.dump(to_good_dict(data.data))
                 # logger.info("response data\n%s" % y)
                 if pycolor:
-                    logger.info("response data\n%s" % highlight(y, YamlLexer(), TerminalFormatter()))
+                    logger.info("response data\n%s" % highlight(y, YamlLexer(), Terminal256Formatter()))
                 else:
                     logger.info("response data\n%s" % y)
                 if self.data_callback:
