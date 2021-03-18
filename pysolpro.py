@@ -144,6 +144,7 @@ if __name__ == '__main__':
         if shared.apc:
             shared.apc.create_cache_from_parser(parser)
 
+        logger.debug("parsing args")
         args = parser.parse_args()
         try:
             from solace_semp_config.rest import ApiException
@@ -153,6 +154,7 @@ if __name__ == '__main__':
 
         if hasattr(args, "func"):
             try:
+                logger.debug("calling generic output processor")
                 generic_output_processor(args.func, args,
                                          callback=SolaceResponseProcessor(
                                              data_callback=DataPersist(save_data=args.save, save_dir=args.savedir),
@@ -169,6 +171,7 @@ if __name__ == '__main__':
                 logger.error("type error %s" % e)
                 sys.exit(1)
             except Exception as e:
+                logger.error("A general exception occurred, %s" % e)
                 parser.print_help()
                 sys.exit(1)
         else:

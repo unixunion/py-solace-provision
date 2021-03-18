@@ -417,4 +417,27 @@ Jump into the broker and enable TLS
     no shutdown
 
 
+# Cheat Sheet
 
+    # clients with short uptime
+    pysolpro.py monitor get_msg_vpn_client_connections --msg_vpn_name default  --client_name '*' --where "uptime<60"
+
+    # queue subscriptions
+    pysolpro.py config get_msg_vpn_queue_subscriptions  --msg_vpn_name default --queue_name somequeue
+    
+    # clients with a specific version of client lib
+    pysolpro.py monitor get_msg_vpn_clients --msg_vpn_name default --where "softwareVersion==10.9.1"
+
+    # clients with a specific IP address
+    pysolpro.py monitor get_msg_vpn_clients --msg_vpn_name default --where "clientAddress==10.0.0.21*"
+
+    # slow subscribers
+    pysolpro.py monitor get_msg_vpn_clients --msg_vpn_name default --where "slowSubscriber==true"
+
+    # transacted sessions ( long running )
+    pysolpro.py monitor get_msg_vpn_client_transacted_sessions --msg_vpn_name default --client_name '*'
+
+    # check if messages older than 30 days in a queue
+    pysolpro.py monitor get_msg_vpn_queue_msgs --msg_vpn_name default --queue_name somequeue --where "spooledTime<` date -v -30d +%s`"
+
+    

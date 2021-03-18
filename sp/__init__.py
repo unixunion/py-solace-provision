@@ -114,6 +114,8 @@ data_mappings:
   MsgVpnResponse: msg_vpn_name
   MsgVpnQueuesResponse: queue_name
   MsgVpnQueueResponse: queue_name
+  # ignore trying to cache other types
+  MsgVpnClientsResponse: ignored
   
 # used for when running PySolPro server
 SERVER:

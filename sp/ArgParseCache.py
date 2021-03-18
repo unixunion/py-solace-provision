@@ -165,6 +165,8 @@ class ArgParserCache:
         object_name_mappings = sp.settings.data_mappings
         try:
             name_field = object_name_mappings[return_type]
+            if name_field == "ignored":
+                return
             logger.debug("name field: %s" % name_field)
             if isinstance(y[0].data, list):
                 for i in y[0].data:

@@ -4,6 +4,7 @@ import yaml
 
 from sp import shared
 from sp.util import to_good_dict
+
 # import sp
 
 logger = logging.getLogger('solace-provision')
@@ -14,10 +15,12 @@ try:
     from pygments import highlight
     from pygments.lexers import YamlLexer
     from pygments.formatters import Terminal256Formatter
+
     pycolor = True
 except ImportError as e:
     logger.warning("pygments not installed")
     pass
+
 
 # this class handles the data types returned by solace
 class SolaceResponseProcessor:
@@ -26,6 +29,7 @@ class SolaceResponseProcessor:
     args = None
 
     def __init__(self, data_callback=None, args=None):
+        logger.debug("SRP initialized")
         self.data_callback = data_callback
         self.args = args
 
@@ -40,7 +44,7 @@ class SolaceResponseProcessor:
             logger.debug("data present")
             if (isinstance(data.data, list)):
                 logger.debug("list response")
-                #TODO FIXME list responses dont desserialize into the plural Response object.
+                # TODO FIXME list responses dont desserialize into the plural Response object.
                 # issue with to_good_dict
                 # y = yaml.dump(to_good_dict(data.data))
                 # logger.info("response data\n%s" % y)
@@ -79,8 +83,12 @@ class SolaceResponseProcessor:
                         except Exception as e:
                             logger.error("unable to update choice completions")
                     self.data_callback(y, *args, **kwargs)
+        else:
+            logger.info("no data response")
 
         if hasattr(data, "meta"):
             logger.debug("meta is present")
             if data.meta.response_code != 200:
                 logger.info("response_code: %s" % data.meta.response_code)
+        else:
+            logger.info("no meta in response")
