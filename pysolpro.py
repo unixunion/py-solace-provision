@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # PYTHON_ARGCOMPLETE_OK
-
+import importlib
 import logging
 import os
 import sys
@@ -130,6 +130,8 @@ if __name__ == '__main__':
                                      settings.commands[cmd]["client_class"],
                                      **kw)
 
+
+
             subp = subparsers.add_parser(cmd).add_subparsers()
 
             if a:
@@ -146,11 +148,6 @@ if __name__ == '__main__':
 
         logger.debug("parsing args")
         args = parser.parse_args()
-        try:
-            from solace_semp_config.rest import ApiException
-        except ImportError as e:
-            logger.error(sp.solace_semp_unavailable_error)
-            raise
 
         if hasattr(args, "func"):
             try:
@@ -161,9 +158,6 @@ if __name__ == '__main__':
                                              args=args
                                          ))
 
-            except ApiException as e:
-                logger.error("error occurred %s" % e)
-                sys.exit(1)
             except AttributeError as e:
                 logger.error("attribute error %s, try adding --help" % e)
                 sys.exit(1)
@@ -172,7 +166,6 @@ if __name__ == '__main__':
                 sys.exit(1)
             except Exception as e:
                 logger.error("A general exception occurred, %s" % e)
-                parser.print_help()
                 sys.exit(1)
         else:
             logger.info("please choose a sub-command")

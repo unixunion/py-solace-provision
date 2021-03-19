@@ -6,14 +6,15 @@ import socketserver
 import sys
 
 from solace_semp_config.rest import ApiException
-import solace_semp_action
-import solace_semp_config
-import solace_semp_monitor
-from solace_semp_action import AllApi as ActionAllApi
-from solace_semp_config import AllApi as ConfigAllApi
-from solace_semp_monitor import AllApi as MonitorAllApi
+# import solace_semp_action
+# import solace_semp_config
+# import solace_semp_monitor
+# from solace_semp_action import AllApi as ActionAllApi
+# from solace_semp_config import AllApi as ConfigAllApi
+# from solace_semp_monitor import AllApi as MonitorAllApi
 
-import sp.SettingsLoader as settings
+import sp
+settings = sp.settings
 from sp.AutoApi import AutoApi
 from sp.SubCommandConfig import create_subcmd_config
 from sp.nw import send_msg

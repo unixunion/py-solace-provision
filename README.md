@@ -396,22 +396,23 @@ You can add your own just by dropping in the appropriate yaml specs.
     docker build --build-arg sempver=9.8.0.12 -t unixunion/pysolpro:dev . 
 
 ##### Building all versions
+Start by checkout solace_semp_client from github.com/unixunion/solace_semp_client one level up from here.
 
-    ls docker_deps/semp_config | xargs -I {} -t docker build --build-arg sempver={} -t unixunion/pysolpro:0.0.2-{} .
+    ls ../solace_semp_client/config | xargs -I {} -t docker build --build-arg sempver={} -t unixunion/pysolpro:0.0.2-{} .
 
 ##### Testing all versions
 
-    ls docker_deps/semp_config | xargs -I {} -t docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml unixunion/pysolpro:0.0.2-{} config get_msg_vpn --msg_vpn_name default
+    ls ../solace_semp_client/config | xargs -I {} -t docker run -v `pwd`/solace.yaml:/opt/pysolpro/solace.yaml unixunion/pysolpro:0.0.2-{} config get_msg_vpn --msg_vpn_name default
 
 ##### Getting all SEMPv2 client whl files
 
-    ls docker_deps/semp_config | xargs -I@ -t docker create unixunion/pysolpro:0.1.1-@ | xargs -I@ docker cp @:/tmp output
+    ls ../solace_semp_client/config | xargs -I@ -t docker create unixunion/pysolpro:0.1.1-@ | xargs -I@ docker cp @:/tmp output
 
 ##### Releasing wheel to pypi
 
 ###### solace_semp_* wheels
 
-    ls docker_deps/semp_config | xargs -I@ -t docker build --build-arg sempver=@ -t unixunion/pysolpro:0.1.3-@ . -f docker_deps/Dockerfile
+    ls ../solace_semp_client/config | xargs -I@ -t docker build --build-arg sempver=@ -t unixunion/pysolpro:0.1.3-@ . -f docker_deps/Dockerfile
 
 ##### Creating self signed cert
 

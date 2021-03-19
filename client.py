@@ -3,7 +3,9 @@
 import socket
 import sys
 
-import sp.SettingsLoader as settings
+import sp
+settings = sp.settings
+
 from sp.nw import recv_msg
 
 BUFF_SIZE = 4096
