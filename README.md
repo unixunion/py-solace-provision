@@ -37,8 +37,8 @@ Working with some minor limitations.
 
 ## Dependencies
 
-pySolPro imports one or several libraries available at runtime, [solace-semp-config](https://pypi.org/project/solace-semp-config/#description) library is required. 
-The monitor and action libraries are optional, and have a performance cost. Only install monitor or action if you intend to use them. 
+pySolPro imports one or several solace-semp libraries available at runtime, at least one of either them is required. 
+Each additional library installed has a performance cost. Only install the needful. If you never use the action api, dont install it. 
 
 ## Docker
 
@@ -58,8 +58,8 @@ available on pypi for your broker. see [pypi](https://pypi.org/user/unixunion/) 
 python3 -m venv ~/solace_9.8
 source ~/solace_9.8/bin/activate
 pip install py-solace-provision
+# at least one of
 pip install solace-semp-config==9.8.0.12
-# optional
 pip install solace-semp-monitor==9.8.0.12
 pip install solace-semp-action==9.8.0.12
 # arg completion
@@ -79,16 +79,12 @@ source ~/solace_9.8/bin/activate
 ```
 
 Install dependencies, where SOLACE_VERSION equals your broker version or closest match. 
-see [https://pypi.org/project/solace-semp-config/](https://pypi.org/project/solace-semp-config/) for available versions 
+see [https://pypi.org/project/solace-semp-config/](https://pypi.org/project/solace-semp-config/) for available versions
+
+Install at least one of:
 
 ```bash
-# required
 pip install solace-semp-config==SOLACE_VERSION
-```
-
-optional action and monitor api support
-
-```bash
 pip install solace-semp-action==SOLACE_VERSION
 pip install solace-semp-monitor==SOLACE_VERSION
 ```
